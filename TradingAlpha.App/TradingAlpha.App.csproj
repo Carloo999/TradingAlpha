@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>aspnet-TradingAlpha.App-3162D28E-B2A2-4755-9FEA-98FB6BBCF41E</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Update="Data\app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0"/>
+    </ItemGroup>
+
+</Project>
