@@ -1,3 +1,6 @@
 ﻿/.idea/
 /TradingAlpha.App/bin/
 /TradingAlpha.App/obj/
+TradingAlpha.App/Data/app.db
+
+identifier.sqlite
