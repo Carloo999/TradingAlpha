@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using TradingAlpha.App.Components;
 using TradingAlpha.App.Components.Account;
 using TradingAlpha.App.Data;
+using TradingAlpha.App.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+builder.Services.AddSingleton<IAlpacaService, AlpacaService>();
+builder.Services.AddSingleton<IStockDataService, StockDataService>();
+builder.Services.AddSingleton<ICryptoDataService, CryptoDataService>();
 
 var app = builder.Build();
 

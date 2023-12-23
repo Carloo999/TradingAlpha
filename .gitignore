@@ -4,3 +4,5 @@
 TradingAlpha.App/Data/app.db
 
 identifier.sqlite
+
+TradingAlpha.App/ApiSettings.json
