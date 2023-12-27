@@ -1,7 +1,7 @@
 ﻿using TradingAlpha.App.Data;
 using TradingAlpha.App.Models;
 
-namespace TradingAlpha.App.Services;
+namespace TradingAlpha.App.Services.Interfaces;
 
 public interface IPortfolioManager
 {

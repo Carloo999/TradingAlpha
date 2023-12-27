@@ -1,5 +1,6 @@
 ﻿using TradingAlpha.App.Data;
 using TradingAlpha.App.Models;
+using TradingAlpha.App.Services.Interfaces;
 
 namespace TradingAlpha.App.Services;
 

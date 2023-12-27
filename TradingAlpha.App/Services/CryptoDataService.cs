@@ -1,4 +1,6 @@
-﻿namespace TradingAlpha.App.Services;
+﻿using TradingAlpha.App.Services.Interfaces;
+
+namespace TradingAlpha.App.Services;
 
 public class CryptoDataService(IAlpacaService alpaca) : ICryptoDataService
 {

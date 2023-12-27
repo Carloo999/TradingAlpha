@@ -4,21 +4,17 @@ using Microsoft.AspNetCore.Identity;
 using TradingAlpha.App.Data;
 using TradingAlpha.App.Enums;
 using TradingAlpha.App.Models;
+using TradingAlpha.App.Services.Interfaces;
 
 namespace TradingAlpha.App.Services;
 
-public class ApplicationUserManager : IApplicationUserManager
+public class ApplicationUserManager(
+    UserManager<ApplicationUser> userManager,
+    ApplicationDbContext db,
+    IWebHostEnvironment hostEnvironment)
+    : IApplicationUserManager
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ApplicationDbContext _db;
-    private readonly IWebHostEnvironment _hostEnvironment;
-    
-    public ApplicationUserManager(UserManager<ApplicationUser> userManager, ApplicationDbContext db, IWebHostEnvironment hostEnvironment)
-    {
-        _userManager = userManager;
-        _db = db;
-        _hostEnvironment = hostEnvironment;
-    }
+    private readonly IWebHostEnvironment _hostEnvironment = hostEnvironment;
 
     private async Task<IdentityResult> AddUserToDb(ApplicationUser user, string password)
     {
@@ -26,13 +22,13 @@ public class ApplicationUserManager : IApplicationUserManager
         user.Portfolio = portfolio;
         user.PortfolioId = user.Portfolio.Id;
         
-        return await _userManager.CreateAsync(user, password);
+        return await userManager.CreateAsync(user, password);
     }
 
     public async Task<IdentityResult> CreateDefaultUser(ApplicationUser user, string password)
     {
         IdentityResult r1= await AddUserToDb(user, password);
-        IdentityResult r2= await _userManager.AddToRoleAsync(user, Roles.User.ToString());
+        IdentityResult r2= await userManager.AddToRoleAsync(user, Roles.User.ToString());
 
         if (r1 == IdentityResult.Success && r2 == IdentityResult.Success)
         {
@@ -47,56 +43,56 @@ public class ApplicationUserManager : IApplicationUserManager
 
         foreach (Roles role in roles)
         {
-            await _userManager.AddToRoleAsync(user, role.ToString());
+            await userManager.AddToRoleAsync(user, role.ToString());
         }
     }
 
     public async Task<IdentityResult> DeleteUser(ApplicationUser user)
     {
-        IdentityResult result = await _userManager.DeleteAsync(user);
+        IdentityResult result = await userManager.DeleteAsync(user);
 
         if (!result.Succeeded) return result;
         
         var userBooks = GetUserPortfolioEntries(user);
         foreach (PortfolioEntry entry in userBooks)
         {
-            _db.PortfolioEntries.Remove(entry);
+            db.PortfolioEntries.Remove(entry);
         }
 
-        _db.Portfolios.Remove(GetUserPortfolio(user));
+        db.Portfolios.Remove(GetUserPortfolio(user));
             
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         return result;
     }
 
     public Portfolio GetUserPortfolio(ApplicationUser user)
     {
-        var b = _db.Portfolios.Where(bl => user.PortfolioId == bl.Id);
+        var b = db.Portfolios.Where(bl => user.PortfolioId == bl.Id);
         return b.First();
     }
     
     public List<PortfolioEntry> GetUserPortfolioEntries(ApplicationUser user)
     {
-        return _db.PortfolioEntries.Where(b => b.PortfolioId == user.PortfolioId).ToList();
+        return db.PortfolioEntries.Where(b => b.PortfolioId == user.PortfolioId).ToList();
     }
 
     public async Task<ApplicationUser?> GetUserByAuthState(AuthenticationState authState)
     {
         ClaimsPrincipal claims = authState.User;
-        ApplicationUser? user = await _userManager.GetUserAsync(claims);
+        ApplicationUser? user = await userManager.GetUserAsync(claims);
         return user;
     }
 
     public async Task<IList<string>> GetUserRole(ApplicationUser user)
     {
-        return await _userManager.GetRolesAsync(user);
+        return await userManager.GetRolesAsync(user);
     }
 
     public async Task<IdentityResult> ChangePrivacySetting(ApplicationUser user, PrivacyStatus status)
     {
         user.PrivacyStatus = status;
-        return await _userManager.UpdateAsync(user);
+        return await userManager.UpdateAsync(user);
     }
 
     public async Task<(bool, bool)> GetIsAuthorized(ApplicationUser owner, ApplicationUser? currentUser)
@@ -131,7 +127,7 @@ public class ApplicationUserManager : IApplicationUserManager
 
     public List<ApplicationUser> GetUsers()
     {
-        return _userManager.Users.ToList();
+        return userManager.Users.ToList();
     }
 
     public Task<decimal> CalcPortfolioWorth(ApplicationUser user)

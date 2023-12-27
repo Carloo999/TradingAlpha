@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using RestSharp;
+using TradingAlpha.App.Services.Interfaces;
 
 namespace TradingAlpha.App.Services;
 
@@ -8,12 +9,12 @@ public class AlpacaService : IAlpacaService
    private string _key = string.Empty;
    private string _secret = string.Empty;
 
-   public async Task<string> RequestDataAsync(string additionToBaseUrl, bool authNeeded = true)
+   public async Task<string> RequestDataAsync(string endpointPath, List<Tuple<string,string>> queryParams, bool authNeeded = true)
    {
       if (_key.Equals(string.Empty) || _secret.Equals(string.Empty)) 
          await Init("ApiSettings.json");
       
-      var options = new RestClientOptions("https://data.alpaca.markets/" + additionToBaseUrl);
+      var options = new RestClientOptions("https://data.alpaca.markets/" + endpointPath);
       var client = new RestClient(options);
       var request = new RestRequest("");
       request.AddHeader("accept", "application/json");
@@ -23,6 +24,12 @@ public class AlpacaService : IAlpacaService
          request.AddHeader("APCA-API-KEY-ID", _key);
          request.AddHeader("APCA-API-SECRET-KEY", _secret);
       }
+
+      foreach (var (name, value) in queryParams)
+      {
+         request.AddQueryParameter(name, value);
+      }
+      
       RestResponse response = await client.GetAsync(request);
       
       return (response.IsSuccessful ? response.Content : throw new InvalidOperationException())!;

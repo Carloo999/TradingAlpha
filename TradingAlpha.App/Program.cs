@@ -5,6 +5,7 @@ using TradingAlpha.App.Components;
 using TradingAlpha.App.Components.Account;
 using TradingAlpha.App.Data;
 using TradingAlpha.App.Services;
+using TradingAlpha.App.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

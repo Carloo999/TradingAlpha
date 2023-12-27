@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using TradingAlpha.App.Data;
 using TradingAlpha.App.Enums;
 
-namespace TradingAlpha.App.Services;
+namespace TradingAlpha.App.Services.Interfaces;
 
 public interface IApplicationUserManager
 {
