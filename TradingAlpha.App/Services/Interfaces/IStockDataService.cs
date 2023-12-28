@@ -4,7 +4,7 @@ namespace TradingAlpha.App.Services.Interfaces;
 
 public interface IStockDataService
 {
-    public Task<List<HistBarsEntry>> GetHistBarData(
+    public Task<HistBars> GetHistBarData(
         string symbols,
         string timeframe,
         string start,

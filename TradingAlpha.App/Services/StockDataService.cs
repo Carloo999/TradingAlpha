@@ -1,11 +1,13 @@
-﻿using TradingAlpha.App.Models;
+﻿using Newtonsoft.Json;
+using TradingAlpha.App.Enums;
+using TradingAlpha.App.Models;
 using TradingAlpha.App.Services.Interfaces;
 
 namespace TradingAlpha.App.Services;
 
 public class StockDataService(IAlpacaService alpacaService) : IStockDataService
 {
-    public async Task<List<HistBarsEntry>> GetHistBarData(
+    public async Task<HistBars> GetHistBarData(
         string symbols,
         string timeframe,
         string start,
@@ -31,9 +33,16 @@ public class StockDataService(IAlpacaService alpacaService) : IStockDataService
         var result = await alpacaService.RequestDataAsync(endpointPath, queryParams);
         return ParseApiResponse(result);
     }
-
-    private List<HistBarsEntry> ParseApiResponse(string result)
+    
+    private HistBars ParseApiResponse(string result)
     {
-        throw new NotImplementedException();
+        var bars = JsonConvert.DeserializeObject<HistBars>(result);
+        if (bars != null)
+        {
+            bars.Type = BaseDataType.Stock;
+            return bars;
+        }
+
+        throw new InvalidOperationException("Invalid API response format");
     }
 }
