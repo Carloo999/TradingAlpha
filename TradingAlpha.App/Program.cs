@@ -39,8 +39,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddSingleton<IAlpacaService, AlpacaService>();
-builder.Services.AddSingleton<IStockDataService, StockDataService>();
-builder.Services.AddSingleton<ICryptoDataService, CryptoDataService>();
+builder.Services.AddSingleton<IStockDataService, DataService>();
+builder.Services.AddSingleton<ICryptoDataService, DataService>();
 
 var app = builder.Build();
 

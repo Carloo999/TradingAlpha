@@ -34,18 +34,6 @@ public class AlpacaService : IAlpacaService
       
       return (response.IsSuccessful ? response.Content : throw new InvalidOperationException())!;
    }
-
-   private async Task temp()
-   {
-      var options = new RestClientOptions("https://data.alpaca.markets/v1beta3/crypto/us/bars?symbols=BTC%2FUSD&timeframe=1D&start=2023-12-01T00%3A00%3A00Z&end=2023-12-23T00%3A00%3A00Z&limit=1000&sort=asc");
-      var client = new RestClient(options);
-      var request = new RestRequest("");
-      request.AddHeader("accept", "application/json");
-      var response = await client.GetAsync(request);
-
-      Console.WriteLine("{0}", response.Content);
-
-   }
    
    private async Task Init(string jsonFilePath)
    {
