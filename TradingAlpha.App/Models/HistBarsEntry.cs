@@ -1,13 +1,31 @@
-﻿namespace TradingAlpha.App.Models;
+﻿using Newtonsoft.Json;
+
+namespace TradingAlpha.App.Models;
 
 public class HistBarsEntry
 {
-   public decimal C { get; set; }
-   public decimal H { get; set; }
-   public decimal L { get; set; }
-   public decimal N { get; set; }
-   public decimal O { get; set; }
-   public DateTime T { get; set; }
-   public long V { get; set; }
-   public decimal Vw { get; set; }
+   [JsonProperty(PropertyName = "c")]
+   public decimal Close { get; set; }
+
+   [JsonProperty(PropertyName = "h")]
+   public decimal High { get; set; }
+   
+   [JsonProperty(PropertyName = "l")]
+   public decimal Low { get; set; }
+   
+   [JsonProperty(PropertyName = "n")]
+   public decimal NumOfTrades { get; set; }
+   
+   [JsonProperty(PropertyName = "o")]
+   public decimal Open { get; set; }
+   
+   
+   [JsonProperty(PropertyName = "t")]
+   public DateTime Time { get; set; }
+
+   [JsonProperty(PropertyName = "v")]
+   public long Volume { get; set; }
+   
+   [JsonProperty(PropertyName = "vw")]
+   public decimal VolumeWeighted { get; set; }
 }
