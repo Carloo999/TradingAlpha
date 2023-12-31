@@ -10,17 +10,17 @@ namespace TradingAlpha.App.Services;
 
 public class ApplicationUserManager(
     UserManager<ApplicationUser> userManager,
-    ApplicationDbContext db,
-    IWebHostEnvironment hostEnvironment)
+    ApplicationDbContext db)
     : IApplicationUserManager
 {
-    private readonly IWebHostEnvironment _hostEnvironment = hostEnvironment;
 
     private async Task<IdentityResult> AddUserToDb(ApplicationUser user, string password)
     {
         var portfolio = new Portfolio();
         user.Portfolio = portfolio;
         user.PortfolioId = user.Portfolio.Id;
+
+        await db.Portfolios.AddAsync(portfolio);
         
         return await userManager.CreateAsync(user, password);
     }

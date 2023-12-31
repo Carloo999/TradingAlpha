@@ -38,6 +38,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+builder.Services.AddScoped<IApplicationUserManager, ApplicationUserManager>();
 builder.Services.AddSingleton<IAlpacaService, AlpacaService>();
 builder.Services.AddSingleton<IStockDataService, DataService>();
 builder.Services.AddSingleton<ICryptoDataService, DataService>();
@@ -66,5 +67,25 @@ app.MapRazorComponents<App>()
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
+
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    IServiceProvider services = scope.ServiceProvider;
+    var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+    
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        if (context.Database.IsSqlite() && context.Database.CanConnect())
+        {
+            await ContextSeed.SeedDefaultRoles(services.GetRequiredService<RoleManager<IdentityRole>>());
+        }    
+    }
+    catch (Exception e)
+    {
+        var logger = loggerFactory.CreateLogger<Program>();
+        logger.LogError("Context Seed failed!");
+    }
+}
 
 app.Run();

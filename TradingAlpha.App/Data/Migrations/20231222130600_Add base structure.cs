@@ -31,7 +31,7 @@ namespace TradingAlpha.App.Migrations
                 type: "TEXT",
                 nullable: false,
                 defaultValue: "");
-
+            
             migrationBuilder.AddColumn<int>(
                 name: "PortfolioId",
                 table: "AspNetUsers",
