@@ -3,7 +3,10 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Identity
 @using TradingAlpha.App.Data
+@using TradingAlpha.App.Enums
+@using TradingAlpha.App.Services.Interfaces
 
+@inject IApplicationUserManager ApplicationUserManager
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IdentityUserAccessor UserAccessor
@@ -24,9 +27,20 @@
                 <label for="username" class="form-label">Username</label>
             </div>
             <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/>
-                <label for="phone-number" class="form-label">Phone number</label>
-                <ValidationMessage For="() => Input.PhoneNumber" class="text-danger"/>
+                <InputSelect @bind-Value="Input.PrivacyStatus" class="form-control" placeholder="Please select status.">
+                    @if (PrivacyStatus == PrivacyStatus.Public)
+                    {
+                        <option selected="selected">@PrivacyStatus.Public</option>
+                        <option>@PrivacyStatus.Private</option>
+                    }
+                    else
+                    {
+                        <option>@PrivacyStatus.Public</option>
+                        <option selected="selected">@PrivacyStatus.Private</option>
+                    }
+                </InputSelect>
+                <label for="privacy-status" class="form-label">Privacy status</label>
+                <ValidationMessage For="() => Input.PrivacyStatus" class="text-danger"/>
             </div>
             <button type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
         </EditForm>
@@ -36,7 +50,7 @@
 @code {
     private ApplicationUser user = default!;
     private string? username;
-    private string? phoneNumber;
+    private PrivacyStatus PrivacyStatus;
 
     [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
 
@@ -44,21 +58,24 @@
 
     protected override async Task OnInitializedAsync()
     {
+        //TODO: somehow get current privacy status and display that
+        
         user = await UserAccessor.GetRequiredUserAsync(HttpContext);
         username = await UserManager.GetUserNameAsync(user);
-        phoneNumber = await UserManager.GetPhoneNumberAsync(user);
-
-        Input.PhoneNumber ??= phoneNumber;
+        PrivacyStatus = user.PrivacyStatus;
+        
+        
     }
 
     private async Task OnValidSubmitAsync()
     {
-        if (Input.PhoneNumber != phoneNumber)
+        if (Input.PrivacyStatus != PrivacyStatus)
         {
-            var setPhoneResult = await UserManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-            if (!setPhoneResult.Succeeded)
+            var setStatusResult = await ApplicationUserManager.ChangePrivacySetting(user, Input.PrivacyStatus);
+
+            if (!setStatusResult.Succeeded)
             {
-                RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set phone number.", HttpContext);
+                RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set privacy status.", HttpContext);
             }
         }
 
@@ -68,9 +85,8 @@
 
     private sealed class InputModel
     {
-        [Phone]
-        [Display(Name = "Phone number")]
-        public string? PhoneNumber { get; set; }
+        [Display(Name = "Privacy status")]
+        public PrivacyStatus PrivacyStatus { get; set; }
     }
 
 }
