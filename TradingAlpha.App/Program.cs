@@ -79,6 +79,7 @@ using (IServiceScope scope = app.Services.CreateScope())
         if (context.Database.IsSqlite() && context.Database.CanConnect())
         {
             await ContextSeed.SeedDefaultRoles(services.GetRequiredService<RoleManager<IdentityRole>>());
+            await ContextSeed.SeedOwnerUser(services.GetRequiredService<UserManager<ApplicationUser>>(), services.GetRequiredService<IApplicationUserManager>());
         }    
     }
     catch (Exception e)

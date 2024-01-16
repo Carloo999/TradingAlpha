@@ -10,3 +10,5 @@ TradingAlpha.App/ApiSettings.json
 *.db-shm
 
 *.db-wal
+
+TradingAlpha.App/OwnerCredentials.json
