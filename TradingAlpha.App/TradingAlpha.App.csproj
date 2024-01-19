@@ -12,11 +12,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Alpaca.Markets" Version="7.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
+        <PackageReference Include="Alpaca.Markets" Version="7.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="RestSharp" Version="110.2.0" />
     </ItemGroup>
