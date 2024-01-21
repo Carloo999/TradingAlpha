@@ -42,6 +42,8 @@ builder.Services.AddScoped<IApplicationUserManager, ApplicationUserManager>();
 builder.Services.AddSingleton<IAlpacaService, AlpacaService>();
 builder.Services.AddSingleton<IStockDataService, DataService>();
 builder.Services.AddSingleton<ICryptoDataService, DataService>();
+builder.Services.AddSingleton<IPortfolioManager, PortfolioManager>();
+builder.Services.AddSingleton<ITransactionManager, TransactionManager>();
 
 var app = builder.Build();
 

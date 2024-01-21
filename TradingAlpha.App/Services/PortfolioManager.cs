@@ -4,7 +4,10 @@ using TradingAlpha.App.Services.Interfaces;
 
 namespace TradingAlpha.App.Services;
 
-public class PortfolioManager : IPortfolioManager
+public class PortfolioManager(
+    ApplicationDbContext db,
+    ITransactionManager transactionManager) 
+    : IPortfolioManager
 {
     public Task AddNewEntry(PortfolioEntry entry, ApplicationUser user)
     {
