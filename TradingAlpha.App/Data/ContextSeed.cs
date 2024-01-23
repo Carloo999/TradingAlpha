@@ -41,7 +41,7 @@ public static class ContextSeed
 
     private static async Task<Tuple<string,string>> GetOwnerCredentials()
     {
-        using var streamReader = new StreamReader("OwnerCredentials.json");
+        using var streamReader = new StreamReader("credentials.json");
         var jsonString = await streamReader.ReadToEndAsync();
         
         using JsonDocument document = JsonDocument.Parse(jsonString);

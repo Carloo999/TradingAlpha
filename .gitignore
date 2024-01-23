@@ -11,4 +11,4 @@ TradingAlpha.App/ApiSettings.json
 
 *.db-wal
 
-TradingAlpha.App/OwnerCredentials.json
+TradingAlpha.App/credentials.json

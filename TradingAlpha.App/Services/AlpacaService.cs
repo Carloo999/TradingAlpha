@@ -41,7 +41,7 @@ public class AlpacaService : IAlpacaService
       var jsonString = await streamReader.ReadToEndAsync();
             
       using JsonDocument document = JsonDocument.Parse(jsonString);
-      var apiSettings = document.RootElement.GetProperty("ApiSettings");
+      var apiSettings = document.RootElement.GetProperty("apisettings");
 
       _key = apiSettings.GetProperty("AlpacaKey").ToString();
       _secret = apiSettings.GetProperty("AlpacaSecret").ToString();
