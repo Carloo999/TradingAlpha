@@ -5,9 +5,11 @@ namespace TradingAlpha.App.Models;
 
 public class PortfolioEntry
 {
-    public int Id { get; set; }
-    public DateTime AddedToPortfolio { get; set; }
+    public decimal CurrentPrice { get; set; }
+    public DateTime LastUpdate { get; set; }
+    public decimal Amount { get; set; }
     
+    public int Id { get; set; }
     [ForeignKey("PortfolioId")]
     public int PortfolioId { get; set; } 
     public Portfolio Portfolio { get; set; }
