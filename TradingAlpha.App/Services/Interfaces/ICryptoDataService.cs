@@ -11,4 +11,6 @@ public interface ICryptoDataService
         string end,
         int limit,
         string sort);
+    
+    public Task<decimal> GetLatestBar(string symbols);
 }
