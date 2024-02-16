@@ -1,7 +1,18 @@
+/* Color Scheme: (HEX)
+Background: Dark #121212
+Accents:    Dark to light
+    #023535
+    #015958
+    #008F8C
+    #0CABA0
+    #0FC2C0
+*/
+
 .page {
     position: relative;
     display: flex;
     flex-direction: column;
+    background-color: #121212;
 }
 
 main {
