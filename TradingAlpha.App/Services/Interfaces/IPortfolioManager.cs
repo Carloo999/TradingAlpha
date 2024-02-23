@@ -5,7 +5,7 @@ namespace TradingAlpha.App.Services.Interfaces;
 
 public interface IPortfolioManager
 {
-    Task AddNewEntry(PortfolioEntry entry, ApplicationUser user);
+    Task ChangeEntryForBuyTransaction(Transaction transaction);
     
     Task SaveEntryChanges();
 

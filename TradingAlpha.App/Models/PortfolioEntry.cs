@@ -3,7 +3,7 @@ using TradingAlpha.App.Enums;
 
 namespace TradingAlpha.App.Models;
 
-public class PortfolioEntry
+public abstract class PortfolioEntry
 {
     public decimal CurrentPrice { get; set; }
     public DateTime LastUpdate { get; set; }
