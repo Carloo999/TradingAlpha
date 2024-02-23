@@ -10,4 +10,5 @@ public abstract class Transaction
     public decimal Amount { get; set; }
     public ApplicationUser User { get; set; }
     public decimal AtPrice { get; set; }
+    public TransactionBaseType TransactionBaseType { get; set; }
 }

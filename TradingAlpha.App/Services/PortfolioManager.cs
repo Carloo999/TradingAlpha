@@ -55,6 +55,63 @@ public class PortfolioManager(
                 logger.LogCritical("Db failure! Multiple portfolio entries for same stock");
             }
         }
+
+        if (transaction.GetType() == typeof(CryptoTransaction))
+        {
+            var cryptoTransaction = (CryptoTransaction)transaction;
+            ApplicationUser user = cryptoTransaction.User;
+            
+            List<PortfolioEntry> portfolio = await GetUserPortfolioEntries(user);
+            var cryptoEntriesWithSameSymbol = portfolio
+                .Where(x => x.GetType() == typeof(CryptoEntry) 
+                            && ((CryptoEntry)x).Name.Equals(cryptoTransaction.Name))
+                .ToList(); 
+            
+            if (cryptoEntriesWithSameSymbol.Count == 0)
+            {
+                var cryptoEntry = new CryptoEntry
+                {
+                    Amount = cryptoTransaction.Amount,
+                    CurrentPrice = cryptoTransaction.AtPrice,
+                    LastUpdate = cryptoTransaction.Timestamp,
+                    PortfolioId = cryptoTransaction.User.PortfolioId,
+                    Name = cryptoTransaction.Name
+                };
+                
+                cryptoEntry.PortfolioId = GetUserPortfolio(user).Id;
+                //Add new portfolio entry
+                await db.PortfolioEntries.AddAsync(cryptoEntry);
+            }
+            else if (cryptoEntriesWithSameSymbol.Count == 1)
+            {
+                var entry = cryptoEntriesWithSameSymbol.First();
+                entry.CurrentPrice = cryptoTransaction.AtPrice;
+                entry.LastUpdate = cryptoTransaction.Timestamp;
+                entry.Amount += cryptoTransaction.Amount;
+                db.Update(entry);
+            }
+            else
+            {
+                logger.LogCritical("Db failure! Multiple portfolio entries for same crypto");
+            }
+        }
+    }
+
+    public void ChangeEntryForSellTransaction(Transaction transaction, PortfolioEntry entry)
+    {
+        if (entry.Amount - transaction.Amount == 0)
+        {
+            db.Remove(entry);
+        }
+        else if (entry.Amount - transaction.Amount > 0)
+        {
+            entry.Amount -= transaction.Amount;
+            db.Update(entry);
+        }
+        else
+        {
+            throw new Exception("Entry amount is negative!");
+        }
     }
 
     public async Task<Portfolio> GetUserPortfolio(ApplicationUser user)
@@ -68,19 +125,9 @@ public class PortfolioManager(
         return await db.PortfolioEntries.Where(x => x.PortfolioId == port.Id).ToListAsync();
     }
 
-    public Task SaveEntryChanges()
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<ICollection<PortfolioEntry>> GetEntries(ApplicationUser user)
+    public async Task<PortfolioEntry[]> GetEntries(ApplicationUser user)
     {
         var portfolio = await GetUserPortfolio(user);
-        return portfolio.PortfolioEntries;
-    }
-
-    public Task DeleteEntry(PortfolioEntry entry)
-    {
-        throw new NotImplementedException();
+        return await db.PortfolioEntries.Where(x => x.PortfolioId == portfolio.Id).ToArrayAsync();
     }
 }

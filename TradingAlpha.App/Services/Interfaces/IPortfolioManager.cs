@@ -7,9 +7,9 @@ public interface IPortfolioManager
 {
     Task ChangeEntryForBuyTransaction(Transaction transaction);
     
-    Task SaveEntryChanges();
+    void ChangeEntryForSellTransaction(Transaction transaction, PortfolioEntry entry);
+    
+    Task<PortfolioEntry[]> GetEntries(ApplicationUser user);
 
-    Task<ICollection<PortfolioEntry>> GetEntries(ApplicationUser user);
-
-    Task DeleteEntry(PortfolioEntry entry);
+    Task<Portfolio> GetUserPortfolio(ApplicationUser user);
 }
