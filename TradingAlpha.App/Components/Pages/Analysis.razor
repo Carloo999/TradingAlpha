@@ -1,5 +1,6 @@
 ﻿@page "/Analysis"
 @using TradingAlpha.App.Services.Interfaces
+@using Microsoft.AspNetCore.Mvc
 @rendermode InteractiveServer
 
 @inject IStockDataService SData
@@ -32,19 +33,25 @@
 
 <PageTitle>Analysis</PageTitle>
 
+@* Search Bar *@
 <div class="input-group mb-3">
-  <input type="text" class="form-control" placeholder="Input crypto or stock symbol" aria-label="Symbol" aria-describedby="basic-addon2">
-  <div class="input-group-append">
-    <button class="btn btn-outline-secondary" type="button">Search</button>
-  </div>
+    <input @bind="SymbolInput" type="text" class="form-control" placeholder="Input crypto or stock symbol" aria-label="Symbol" aria-describedby="basic-addon2" id="SymbolSearch">
+    <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" @onclick="getInput">Search</button>
+    </div>
 </div>
+
+<p>@Message</p>
+
+@*Graph and indicators*@
 <div class="row">
+    @* Graph *@
     <div class="col-9">
         <div class="container"
              align="left"
              id="Chart">
             <ApexChart TItem="MyData"
-                       Height = "@("100%")">
+                       Height="@("100%")">
 
                 <ApexPointSeries TItem="MyData"
                                  Items="Data"
@@ -63,18 +70,19 @@
         </div>
     </div>
     
+    @* Indicators *@
     <div class="col">
         <div class="container">
-            
+
             <h5>Indicators</h5>
-            
+
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" role="switch" id="TradingVolume">
                 <label class="form-check-label" for="TradingVolume">
                     Trading Volume
                 </label>
             </div>
-            
+
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" role="switch" id="MovingAverage">
                 <label class="form-check-label" for="MovingAverage">
@@ -127,5 +135,14 @@ color scheme
         public string Category { get; set; }
         public int NetProfit { get; set; }
         public int Revenue { get; set; }
+    }
+    
+
+    string SymbolInput { get; set; }
+    string Message { get; set; }
+
+    void getInput()
+    { 
+        Message = $"Input: {SymbolInput}";
     }
 }
