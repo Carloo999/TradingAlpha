@@ -4,13 +4,24 @@
 
 @inject IStockDataService SData
 @inject ICryptoDataService CData
+
 <style>
     .container {
         border: 3px rgba(15, 194, 192,0.4);
-        border-radius: 10px;
+        border-radius: 15px;
         border-style: solid;
         padding: 10px;;
     }
+    
+    .form-check-input:checked {
+        background-color: #015958;
+    }
+    
+    #Chart {
+        height: 500px;
+    }
+    
+    
     .background {background: #121212;}
     .accent1 {background: #023535}
     .accent2 {background: #015958}
@@ -30,10 +41,10 @@
 <div class="row">
     <div class="col-9">
         <div class="container"
-             align="left">
+             align="left"
+             id="Chart">
             <ApexChart TItem="MyData"
-                       Width="800"
-                       Height="400">
+                       Height = "@("100%")">
 
                 <ApexPointSeries TItem="MyData"
                                  Items="Data"
@@ -57,23 +68,23 @@
             
             <h5>Indicators</h5>
             
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="TradingVolume">
+                <label class="form-check-label" for="TradingVolume">
                     Trading Volume
                 </label>
             </div>
             
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="MovingAverage">
+                <label class="form-check-label" for="MovingAverage">
                     Moving Average
                 </label>
             </div>
 
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="RSI">
+                <label class="form-check-label" for="RSI">
                     RSI
                 </label>
             </div>
