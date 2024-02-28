@@ -1,6 +1,8 @@
 ﻿@page "/Analysis"
 @using TradingAlpha.App.Services.Interfaces
 @using Microsoft.AspNetCore.Mvc
+@using Microsoft.EntityFrameworkCore.Query.Internal
+@using TradingAlpha.App.Models
 @rendermode InteractiveServer
 
 @inject IStockDataService SData
@@ -22,6 +24,11 @@
         height: 500px;
     }
     
+    .btn-group{
+        padding: 10px;
+        text-align: center;
+        width: 100%;
+    }
     
     .background {background: #121212;}
     .accent1 {background: #023535}
@@ -37,11 +44,12 @@
 <div class="input-group mb-3">
     <input @bind="SymbolInput" type="text" class="form-control" placeholder="Input crypto or stock symbol" aria-label="Symbol" aria-describedby="basic-addon2" id="SymbolSearch">
     <div class="input-group-append">
-        <button class="btn btn-outline-secondary" type="button" @onclick="getInput">Search</button>
+        <button class="btn btn-outline-secondary" type="button" @onclick="getStockData" >Search</button>
     </div>
 </div>
 
 <p>@Message</p>
+<p>@open</p>
 
 @*Graph and indicators*@
 <div class="row">
@@ -72,6 +80,22 @@
     
     @* Indicators *@
     <div class="col">
+        
+        <div class="container">
+            <div class="btn-group btn-group-sm" role="group" aria-label="Delta T">
+                <button type="button" class="btn btn-secondary">Hour</button>
+                <button type="button" class="btn btn-secondary">Day</button>
+                <button type="button" class="btn btn-secondary">Month</button>
+            </div>
+            <div class="btn-group btn-group-sm" role="group" aria-label="TimeFrame">
+                <button type="button" class="btn btn-secondary">1D</button>
+                <button type="button" class="btn btn-secondary">1M</button>
+                <button type="button" class="btn btn-secondary">6M</button>
+                <button type="button" class="btn btn-secondary">1Y</button>
+                <button type="button" class="btn btn-secondary">5Y</button>
+            </div>
+        </div>
+        
         <div class="container">
 
             <h5>Indicators</h5>
@@ -122,7 +146,9 @@ color scheme
 </div>
 *@
 @code {
+
     private List<MyData> Data { get; set; } = new();
+
     protected override void OnInitialized()
     {
         Data.Add(new MyData { Category = "Jan", NetProfit = 12, Revenue = 33 });
@@ -136,20 +162,62 @@ color scheme
         public int NetProfit { get; set; }
         public int Revenue { get; set; }
     }
-    
+
 
     string SymbolInput { get; set; }
     string Message { get; set; }
+    decimal open { get; set; }
+
+
+    @* Candlestick data 
+    private List<StockPrice> stockPrices { get; set; } =
+    *@
 
     void getInput()
-    { 
+    {
         Message = $"Input: {SymbolInput}";
     }
-    @*
-    public void getStockData()
+
+
+    public async Task getStockData()
     {
         getInput();
-        var Input = Message;
-        SData.GetHistBarData(Message,"day",)
-    }*@
+        var Data = await SData.GetHistBarData(SymbolInput, "1D", "2022-01-03T00:00:00Z", DateTimeExtensions.ToRFC3339(Date), 1000, "raw", "sip", "asc");
+        HistBars Bars = Data;
+        open = Bars.Bars[SymbolInput][0].Open;
+    }
+
+    @*
+    public async Task getStockData()
+    {
+        HistBars bars = await SData.GetHistBarData(SymbolInput, "1D", "2022-01-03T00:00:00Z", "2022-01-04T00:00:00Z", 1000, "raw", "sip", "asc");
+        open = bars.Bars[SymbolInput][0].Open;
+    }
+    
+    }
+    *@
+
+    DateTime Date = DateTime.Today;
+
+    public static class DateTimeExtensions
+    {
+        public static string ToRFC3339(DateTime date)
+        {
+            return date.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.fffK");
+        }
+    }
+
 }
+@*
+GetHistBarData()
+symbols: AAPL,GOOG, / AAPL
+timeframe: 
+start:
+end:
+limit:
+adjustment:
+sort:
+https://docs.alpaca.markets/reference/stockbars
+GetLatestBar()
+
+*@ 
