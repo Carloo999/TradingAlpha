@@ -13,4 +13,6 @@ public interface IStockDataService
         string adjustment,
         string feed,
         string sort);
+
+    public Task<decimal> GetLatestBar(string symbols, string currency);
 }
