@@ -8,35 +8,7 @@
 @inject IStockDataService SData
 @inject ICryptoDataService CData
 
-<style>
-    .container {
-        border: 3px rgba(15, 194, 192,0.4);
-        border-radius: 15px;
-        border-style: solid;
-        padding: 10px;;
-    }
-    
-    .form-check-input:checked {
-        background-color: #015958;
-    }
-    
-    #Chart {
-        height: 500px;
-    }
-    
-    .btn-group{
-        padding: 10px;
-        text-align: center;
-        width: 100%;
-    }
-    
-    .background {background: #121212;}
-    .accent1 {background: #023535}
-    .accent2 {background: #015958}
-    .accent3 {background: #008F8C}
-    .accent4 {background: #0CABA0}
-    .accent5 {background: #0FC2C0}
-</style>
+
 
 <PageTitle>Analysis</PageTitle>
 
@@ -44,12 +16,9 @@
 <div class="input-group mb-3">
     <input @bind="SymbolInput" type="text" class="form-control" placeholder="Input crypto or stock symbol" aria-label="Symbol" aria-describedby="basic-addon2" id="SymbolSearch">
     <div class="input-group-append">
-        <button class="btn btn-outline-secondary" type="button" @onclick="getStockData" >Search</button>
+        <button class="btn btn-outline-secondary" type="button" @onclick="getDataAndRender" >Search</button>
     </div>
 </div>
-
-<p>@Message</p>
-<p>@open</p>
 
 @*Graph and indicators*@
 <div class="row">
@@ -58,22 +27,28 @@
         <div class="container"
              align="left"
              id="Chart">
-            <ApexChart TItem="MyData"
-                       Height="@("100%")">
-
+            <ApexChart @ref=chart TItem="HistBarsEntry"
+                       Height="@("100%")"
+                       XAxisType="XAxisType.Datetime"
+                       Debug>
+                @*
                 <ApexPointSeries TItem="MyData"
                                  Items="Data"
                                  Name="Net Profit"
                                  SeriesType="SeriesType.Bar"
                                  XValue="e => e.Category"
-                                 YValue="e => e.NetProfit"/>
-
-                <ApexPointSeries TItem="MyData"
-                                 Items="Data"
-                                 Name="Revenue"
-                                 SeriesType="SeriesType.Bar"
-                                 XValue="e => e.Category"
-                                 YValue="e => e.Revenue"/>
+                                 YValue="e => e.NetProfit"/>*@
+                
+                <ApexCandleSeries TItem="HistBarsEntry"
+                                  Items="HistBarsEntries"
+                                  Name="Apex Stock Price"
+                                  XValue="@(e => DateTime.SpecifyKind(e.Time, DateTimeKind.Utc))"
+                                  Open="@(e => e.Open)"
+                                  High="@(e => e.High)"
+                                  Low="@(e => e.Low)"
+                                  Close="@(e => e.Close)"
+                                  OrderByDescending="e=> e.X" />
+                
             </ApexChart>
         </div>
     </div>
@@ -81,13 +56,17 @@
     @* Indicators *@
     <div class="col">
         
-        <div class="container">
-            <div class="btn-group btn-group-sm" role="group" aria-label="Delta T">
-                <button type="button" class="btn btn-secondary">Hour</button>
-                <button type="button" class="btn btn-secondary">Day</button>
-                <button type="button" class="btn btn-secondary">Month</button>
-            </div>
+        <div class="container" id="FrameStartDate">
+            <h5>Bar Width</h5>
             <div class="btn-group btn-group-sm" role="group" aria-label="TimeFrame">
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1min"))">1min</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("15min"))">15min</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1H"))">Hour</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1D"))">Day</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1M"))">Month</button>
+            </div>
+            <h5>Timeframe</h5>
+            <div class="btn-group btn-group-sm" role="group" aria-label="StartDate">
                 <button type="button" class="btn btn-secondary">1D</button>
                 <button type="button" class="btn btn-secondary">1M</button>
                 <button type="button" class="btn btn-secondary">6M</button>
@@ -96,7 +75,7 @@
             </div>
         </div>
         
-        <div class="container">
+        <div class="container" id="Indicators">
 
             <h5>Indicators</h5>
 
@@ -124,79 +103,33 @@
     </div>
 </div>
 
-@*
-<div class="row">
-color scheme
-    <div class="col">
-        <div class="background">
-            Background
-        </div>
-        <div class="accent1">
-            accent1
-        </div>
-        <div class="accent2">
-            accent2
-        </div>
-        <div class="accent3">
-            accent3
-        </div>
-        <div class="accent4"> accent4</div>
-    <div class="accent5"> accent5</div>
-        </div>
-</div>
-*@
 @code {
 
-    private List<MyData> Data { get; set; } = new();
+    private ApexChart<HistBarsEntry> chart;
+    
+    public List<HistBarsEntry> HistBarsEntries { get; set; }
 
-    protected override void OnInitialized()
+    public async Task getDataAndRender()
     {
-        Data.Add(new MyData { Category = "Jan", NetProfit = 12, Revenue = 33 });
-        Data.Add(new MyData { Category = "Feb", NetProfit = 43, Revenue = 42 });
-        Data.Add(new MyData { Category = "Mar", NetProfit = 112, Revenue = 23 });
-    }
-
-    public class MyData
-    {
-        public string Category { get; set; }
-        public int NetProfit { get; set; }
-        public int Revenue { get; set; }
-    }
-
-
-    string SymbolInput { get; set; }
-    string Message { get; set; }
-    decimal open { get; set; }
-
-
-    @* Candlestick data 
-    private List<StockPrice> stockPrices { get; set; } =
-    *@
-
-    void getInput()
-    {
-        Message = $"Input: {SymbolInput}";
-    }
-
-
-    public async Task getStockData()
-    {
-        getInput();
-        var Data = await SData.GetHistBarData(SymbolInput, "1D", "2022-01-03T00:00:00Z", DateTimeExtensions.ToRFC3339(Date), 1000, "raw", "sip", "asc");
-        HistBars Bars = Data;
-        open = Bars.Bars[SymbolInput][0].Open;
-    }
-
-    @*
-    public async Task getStockData()
-    {
-        HistBars bars = await SData.GetHistBarData(SymbolInput, "1D", "2022-01-03T00:00:00Z", "2022-01-04T00:00:00Z", 1000, "raw", "sip", "asc");
-        open = bars.Bars[SymbolInput][0].Open;
+        HistBars BaseData = await SData.GetHistBarData(SymbolInput, TimeFrame, "2022-01-03T00:00:00Z", DateTimeExtensions.ToRFC3339(Date), 1000, "raw", "sip", "asc");
+        HistBarsEntries = BaseData.Bars[SymbolInput];
+        await chart.RenderAsync();
     }
     
-    }
-    *@
+    public string SymbolInput { get; set; }
 
+    public string TimeFrame { get; set; } = "1H";
+
+    public void SetTimeFrame(string frame)
+    {
+        TimeFrame = frame;
+    }
+   
+    
+    
+    
+    
+    
     DateTime Date = DateTime.Today;
 
     public static class DateTimeExtensions
@@ -206,7 +139,7 @@ color scheme
             return date.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.fffK");
         }
     }
-
+    
 }
 @*
 GetHistBarData()
