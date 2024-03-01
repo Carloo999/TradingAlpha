@@ -4,6 +4,13 @@
     border-style: solid;
     padding: 10px;;
 }
+#FrameStartDate{
+    margin-bottom: 10px;
+}
+
+#Indicators{
+    margin-top: 10px;
+}
 
 .form-check-input:checked {
     background-color: #015958;

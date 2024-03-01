@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Mvc
 @using Microsoft.EntityFrameworkCore.Query.Internal
 @using TradingAlpha.App.Models
+@using System.Globalization
 @rendermode InteractiveServer
 
 @inject IStockDataService SData
@@ -29,7 +30,6 @@
              id="Chart">
             <ApexChart @ref=chart TItem="HistBarsEntry"
                        Height="@("100%")"
-                       XAxisType="XAxisType.Datetime"
                        Debug>
                 @*
                 <ApexPointSeries TItem="MyData"
@@ -42,12 +42,12 @@
                 <ApexCandleSeries TItem="HistBarsEntry"
                                   Items="HistBarsEntries"
                                   Name="Apex Stock Price"
-                                  XValue="@(e => DateTime.SpecifyKind(e.Time, DateTimeKind.Utc))"
+                                  XValue="@(e => RemoveLastChar(e.Time.ToUniversalTime().ToString("u")))"
                                   Open="@(e => e.Open)"
                                   High="@(e => e.High)"
                                   Low="@(e => e.Low)"
                                   Close="@(e => e.Close)"
-                                  OrderByDescending="e=> e.X" />
+                                  />
                 
             </ApexChart>
         </div>
@@ -57,7 +57,7 @@
     <div class="col">
         
         <div class="container" id="FrameStartDate">
-            <h5>Bar Width</h5>
+            <h5>Bar width</h5>
             <div class="btn-group btn-group-sm" role="group" aria-label="TimeFrame">
                 <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1min"))">1min</button>
                 <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("15min"))">15min</button>
@@ -67,11 +67,11 @@
             </div>
             <h5>Timeframe</h5>
             <div class="btn-group btn-group-sm" role="group" aria-label="StartDate">
-                <button type="button" class="btn btn-secondary">1D</button>
-                <button type="button" class="btn btn-secondary">1M</button>
-                <button type="button" class="btn btn-secondary">6M</button>
-                <button type="button" class="btn btn-secondary">1Y</button>
-                <button type="button" class="btn btn-secondary">5Y</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("1D"))">1D</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("1M"))">1M</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("6M"))">6M</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("1Y"))">1Y</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("5Y"))">5Y</button>
             </div>
         </div>
         
@@ -108,10 +108,11 @@
     private ApexChart<HistBarsEntry> chart;
     
     public List<HistBarsEntry> HistBarsEntries { get; set; }
-
+    
+    
     public async Task getDataAndRender()
     {
-        HistBars BaseData = await SData.GetHistBarData(SymbolInput, TimeFrame, "2022-01-03T00:00:00Z", DateTimeExtensions.ToRFC3339(Date), 1000, "raw", "sip", "asc");
+        HistBars BaseData = await SData.GetHistBarData(SymbolInput, TimeFrame, DateTimeExtensions.ToRFC3339(StartDate), DateTimeExtensions.ToRFC3339(Date), 1000, "raw", "sip", "asc");
         HistBarsEntries = BaseData.Bars[SymbolInput];
         await chart.RenderAsync();
     }
@@ -124,11 +125,31 @@
     {
         TimeFrame = frame;
     }
-   
-    
-    
-    
-    
+
+    public DateTime StartDate { get; set; } = DateTime.Today.AddMonths(-1);
+
+    public void SetStartDate(string timestring)
+    {
+        switch (timestring)
+        {
+            case "1D":
+                StartDate = DateTime.Today.AddDays(-1);
+                break;
+            case "1M":
+                StartDate = DateTime.Today.AddMonths(-1);
+                break;
+            case "6M":
+                StartDate = DateTime.Today.AddMonths(-6);
+                break;
+            case "1Y":
+                StartDate = DateTime.Today.AddYears(-1);
+                break;
+            case "5Y":
+                StartDate = DateTime.Today.AddYears(-5);
+                break;
+        }
+       
+    }
     
     DateTime Date = DateTime.Today;
 
@@ -139,18 +160,9 @@
             return date.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.fffK");
         }
     }
-    
-}
-@*
-GetHistBarData()
-symbols: AAPL,GOOG, / AAPL
-timeframe: 
-start:
-end:
-limit:
-adjustment:
-sort:
-https://docs.alpaca.markets/reference/stockbars
-GetLatestBar()
 
-*@ 
+    public string RemoveLastChar(string input)
+    {
+        return input.Remove(input.Length - 1);
+    }
+}
