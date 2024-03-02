@@ -13,13 +13,12 @@ public class MigrationTests
             .UseSqlite(@"DataSource=Data\\app.db;Cache=Shared")
             .Options;
 
-        using (var context = new ApplicationDbContext(options))
-        {
-            // Act
-            var pendingMigrations = context.Database.GetPendingMigrations();
+        using var context = new ApplicationDbContext(options);
+        
+        // Act
+        var pendingMigrations = context.Database.GetPendingMigrations();
             
-            // Assert
-            Assert.Empty(pendingMigrations);
-        }
+        // Assert
+        pendingMigrations.Should().BeEmpty();
     }
 }
