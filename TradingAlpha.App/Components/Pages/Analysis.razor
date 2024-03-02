@@ -42,7 +42,7 @@
                 <ApexCandleSeries TItem="HistBarsEntry"
                                   Items="HistBarsEntries"
                                   Name="Apex Stock Price"
-                                  XValue="@(e => RemoveLastChar(e.Time.ToUniversalTime().ToString("u")))"
+                                  XValue="@(e => formatDateTime(e.Time))"
                                   Open="@(e => e.Open)"
                                   High="@(e => e.High)"
                                   Low="@(e => e.Low)"
@@ -52,7 +52,7 @@
             </ApexChart>
         </div>
     </div>
-    
+
     @* Indicators *@
     <div class="col">
         
@@ -109,7 +109,6 @@
     
     public List<HistBarsEntry> HistBarsEntries { get; set; }
     
-    
     public async Task getDataAndRender()
     {
         HistBars BaseData = await SData.GetHistBarData(SymbolInput, TimeFrame, DateTimeExtensions.ToRFC3339(StartDate), DateTimeExtensions.ToRFC3339(Date), 1000, "raw", "sip", "asc");
@@ -165,4 +164,34 @@
     {
         return input.Remove(input.Length - 1);
     }
+
+    public DateTime prevDateTime { get; set; } = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+    public string formatDateTime(DateTime currDateTime)
+    {
+        if (currDateTime.Day != prevDateTime.Day)
+        {
+            prevDateTime = currDateTime;@*RemoveLastChar(currDateTime.ToUniversalTime().ToString("u"))*@
+            return(currDateTime.ToString("d",
+                CultureInfo.CreateSpecificCulture("en-US")));
+        }
+        else
+        {
+            prevDateTime = currDateTime;
+            return (currDateTime.ToString("t", CultureInfo.CreateSpecificCulture("es-ES")));
+        }
+    }
+    @*
+    public string DateTimeToUnixTimestamp(DateTime input)
+    {
+        TimeSpan timeSpan = input - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        return timeSpan.TotalSeconds.ToString();
+    }
+
+    public DateTime UnixTimestampToDateTime(string input)
+    {
+        DateTime zerodate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        return zerodate.AddSeconds(long.Parse(input));
+    }
+*@
 }
