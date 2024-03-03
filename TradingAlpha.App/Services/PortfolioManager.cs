@@ -119,6 +119,23 @@ public class PortfolioManager(
         return await db.Portfolios.FirstAsync(x => x.User.Equals(user));
     }
 
+    public async Task<StockEntry[]> GetStockEntries(ApplicationUser user)
+    {
+        var entries = await GetUserPortfolioEntries(user);
+        return entries.Where(e => e is StockEntry).Cast<StockEntry>().ToArray();
+    }
+
+    public async Task<CryptoEntry[]> GetCryptoEntries(ApplicationUser user)
+    {
+        var entries = await GetUserPortfolioEntries(user);
+        return entries.Where(e => e is CryptoEntry).Cast<CryptoEntry>().ToArray();
+    }
+
+    public Task UpdateAllPricesInPort(ApplicationUser user)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<List<PortfolioEntry>> GetUserPortfolioEntries(ApplicationUser user)
     {
         var port = await GetUserPortfolio(user);
