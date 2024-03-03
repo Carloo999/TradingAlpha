@@ -44,6 +44,7 @@ builder.Services.AddSingleton<IStockDataService, DataService>();
 builder.Services.AddSingleton<ICryptoDataService, DataService>();
 builder.Services.AddScoped<IPortfolioManager, PortfolioManager>();
 builder.Services.AddScoped<ITransactionManager, TransactionManager>();
+builder.Services.AddScoped<IDateTimeProvider, DateTimeProvider>();
 
 var app = builder.Build();
 

@@ -1,0 +1,34 @@
+﻿.container {
+    border: 3px rgba(15, 194, 192,0.4);
+    border-radius: 15px;
+    border-style: solid;
+    padding: 10px;;
+}
+#FrameStartDate{
+    margin-bottom: 10px;
+}
+
+#Indicators{
+    margin-top: 10px;
+}
+
+.form-check-input:checked {
+    background-color: #015958;
+}
+
+#Chart {
+    height: 500px;
+}
+
+.btn-group{
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.background {background: #121212;}
+.accent1 {background: #023535}
+.accent2 {background: #015958}
+.accent3 {background: #008F8C}
+.accent4 {background: #0CABA0}
+.accent5 {background: #0FC2C0}
