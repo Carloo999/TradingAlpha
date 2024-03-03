@@ -6,6 +6,6 @@ namespace TradingAlpha.App.Services.Interfaces;
 
 public interface ITransactionManager
 {
-    Task Buy(ApplicationUser user, BaseDataType type, decimal amount, decimal price, string symbol);
-    Task Sell(ApplicationUser user, BaseDataType type, decimal amount, decimal price, string symbol);
+    Task Buy(ApplicationUser user, BaseDataType type, decimal amount, string symbol);
+    Task Sell(ApplicationUser user, BaseDataType type, decimal amount, string symbol);
 }

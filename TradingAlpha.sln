@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradingAlpha.App", "Trading
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B7104760-B481-45E9-88EA-24457A601C25}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradingAlpha.Tests.Unit", "TradingAlpha.Tests.Unit\TradingAlpha.Tests.Unit.csproj", "{6FEFA14E-DF40-47CA-9C41-E2C2A1B1E386}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,11 +21,16 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2E7F697D-FBB8-4B29-81B3-70813B272995} = {48DAB875-E0A8-4BF4-9AE0-0384968A174B}
+		{6FEFA14E-DF40-47CA-9C41-E2C2A1B1E386} = {B7104760-B481-45E9-88EA-24457A601C25}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{2E7F697D-FBB8-4B29-81B3-70813B272995}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2E7F697D-FBB8-4B29-81B3-70813B272995}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E7F697D-FBB8-4B29-81B3-70813B272995}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E7F697D-FBB8-4B29-81B3-70813B272995}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FEFA14E-DF40-47CA-9C41-E2C2A1B1E386}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FEFA14E-DF40-47CA-9C41-E2C2A1B1E386}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FEFA14E-DF40-47CA-9C41-E2C2A1B1E386}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FEFA14E-DF40-47CA-9C41-E2C2A1B1E386}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

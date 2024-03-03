@@ -12,3 +12,9 @@ TradingAlpha.App/ApiSettings.json
 *.db-wal
 
 TradingAlpha.App/OwnerCredentials.json
+
+TradingAlpha.Tests.Unit/bin/
+
+TradingAlpha.Tests.Unit/obj/
+
+TradingAlpha.sln.DotSettings.user
