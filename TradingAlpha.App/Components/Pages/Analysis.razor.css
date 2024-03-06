@@ -1,5 +1,5 @@
 ﻿.container {
-    border: 3px rgba(15, 194, 192,0.4);
+    border: 3px rgba(15, 194, 192,0.3);
     border-radius: 15px;
     border-style: solid;
     padding: 10px;;
@@ -22,7 +22,7 @@
 
 .btn-group{
     padding: 10px;
-    text-align: center;
+    text-align: center; 
     width: 100%;
 }
 

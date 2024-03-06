@@ -14,10 +14,10 @@
 <PageTitle>Analysis</PageTitle>
 
 @* Search Bar *@
-<div class="input-group mb-3">
+<div class="input-group mb-3" id="symbol_input_group">
     <input @bind="SymbolInput" type="text" class="form-control" placeholder="Input crypto or stock symbol" aria-label="Symbol" aria-describedby="basic-addon2" id="SymbolSearch">
     <div class="input-group-append">
-        <button class="btn btn-outline-secondary" type="button" @onclick="getDataAndRender" >Search</button>
+        <button class="btn btn-outline-secondary" type="button" @onclick="GetDataAndRender" >Search</button>
     </div>
 </div>
 
@@ -42,7 +42,7 @@
                 <ApexCandleSeries TItem="HistBarsEntry"
                                   Items="HistBarsEntries"
                                   Name="Apex Stock Price"
-                                  XValue="@(e => formatDateTime(e.Time))"
+                                  XValue="@(e => FormatDateTime(e.Time))"
                                   Open="@(e => e.Open)"
                                   High="@(e => e.High)"
                                   Low="@(e => e.Low)"
@@ -108,15 +108,16 @@
     private ApexChart<HistBarsEntry> chart;
     
     public List<HistBarsEntry> HistBarsEntries { get; set; }
-    
-    public async Task getDataAndRender()
+
+    private async Task GetDataAndRender()
     {
         HistBars BaseData = await SData.GetHistBarData(SymbolInput, TimeFrame, DateTimeExtensions.ToRFC3339(StartDate), DateTimeExtensions.ToRFC3339(Date), 1000, "raw", "sip", "asc");
         HistBarsEntries = BaseData.Bars[SymbolInput];
         await chart.RenderAsync();
     }
     
-    public string SymbolInput { get; set; }
+    
+    private string SymbolInput { get; set; }
 
     public string TimeFrame { get; set; } = "1H";
 
@@ -165,19 +166,19 @@
         return input.Remove(input.Length - 1);
     }
 
-    public DateTime prevDateTime { get; set; } = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    private DateTime PrevDateTime { get; set; } = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-    public string formatDateTime(DateTime currDateTime)
+    private string FormatDateTime(DateTime currDateTime)
     {
-        if (currDateTime.Day != prevDateTime.Day)
+        if (currDateTime.Day != PrevDateTime.Day)
         {
-            prevDateTime = currDateTime;@*RemoveLastChar(currDateTime.ToUniversalTime().ToString("u"))*@
+            PrevDateTime = currDateTime;@*RemoveLastChar(currDateTime.ToUniversalTime().ToString("u"))*@
             return(currDateTime.ToString("d",
                 CultureInfo.CreateSpecificCulture("en-US")));
         }
         else
         {
-            prevDateTime = currDateTime;
+            PrevDateTime = currDateTime;
             return (currDateTime.ToString("t", CultureInfo.CreateSpecificCulture("es-ES")));
         }
     }
