@@ -24,4 +24,6 @@ public interface IApplicationUserManager
     List<ApplicationUser> GetUsers();
 
     Task<decimal> CalcPortfolioWorth(ApplicationUser user);
+
+    Task<ApplicationUser?> GetUserById(string id);
 }

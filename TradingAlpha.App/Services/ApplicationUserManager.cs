@@ -10,7 +10,8 @@ namespace TradingAlpha.App.Services;
 
 public class ApplicationUserManager(
     UserManager<ApplicationUser> userManager,
-    ApplicationDbContext db)
+    ApplicationDbContext db,
+    IPortfolioManager portfolioManager)
     : IApplicationUserManager
 {
 
@@ -130,8 +131,14 @@ public class ApplicationUserManager(
         return userManager.Users.ToList();
     }
 
-    public Task<decimal> CalcPortfolioWorth(ApplicationUser user)
+    public async Task<decimal> CalcPortfolioWorth(ApplicationUser user)
     {
-        throw new NotImplementedException();
+        var entries = await portfolioManager.GetEntries(user);
+        return entries.Sum(entry => entry.CurrentPrice * entry.Amount);
+    }
+
+    public async Task<ApplicationUser?> GetUserById(string id)
+    {
+        return await userManager.FindByIdAsync(id);
     }
 }
