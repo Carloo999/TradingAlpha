@@ -4,6 +4,7 @@
 @using Microsoft.EntityFrameworkCore.Query.Internal
 @using TradingAlpha.App.Models
 @using System.Globalization
+@using System.Diagnostics
 @rendermode InteractiveServer
 
 @inject IStockDataService SData
@@ -28,7 +29,7 @@
         <div class="container"
              align="left"
              id="Chart">
-            <ApexChart @ref=chart TItem="HistBarsEntry"
+            <ApexChart @ref=_mainChart TItem="HistBarsEntry"
                        Height="@("100%")"
                        Debug>
                 @*
@@ -40,14 +41,14 @@
                                  YValue="e => e.NetProfit"/>*@
                 
                 <ApexCandleSeries TItem="HistBarsEntry"
-                                  Items="HistBarsEntries"
+                                  Items="HistBarEntries"
                                   Name="Apex Stock Price"
                                   XValue="@(e => FormatDateTime(e.Time))"
                                   Open="@(e => e.Open)"
                                   High="@(e => e.High)"
                                   Low="@(e => e.Low)"
                                   Close="@(e => e.Close)"
-                                  />
+                />
                 
             </ApexChart>
         </div>
@@ -80,45 +81,91 @@
             <h5>Indicators</h5>
 
             <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="TradingVolume">
-                <label class="form-check-label" for="TradingVolume">
-                    Trading Volume
+                <input class="form-check-input" type="checkbox" role="switch" id="Volume">
+                <label class="form-check-label" title="Trading Volume" for="Volume">
+                    Volume
                 </label>
             </div>
 
             <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="MovingAverage">
-                <label class="form-check-label" for="MovingAverage">
-                    Moving Average
+                <input class="form-check-input" type="checkbox" role="switch" id="VWAP">
+                <label class="form-check-label" title="Volume Weighted Average Price" for="VWAP">
+                    VWAP
+                </label>
+            </div>
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="SMA">
+                <label class="form-check-label" title="Simple Moving Average" for="SMA">
+                    SMA
                 </label>
             </div>
 
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" role="switch" id="RSI">
-                <label class="form-check-label" for="RSI">
+                <label class="form-check-label" title="Relative Strength Index" for="RSI">
                     RSI
                 </label>
             </div>
         </div>
     </div>
 </div>
+<p>@ErrMessage</p>
 
 @code {
-
-    private ApexChart<HistBarsEntry> chart;
-    
-    public List<HistBarsEntry> HistBarsEntries { get; set; }
-
+    private ApexChart<HistBarsEntry> _mainChart;
+    public List<HistBarsEntry>? HistBarEntries { get; set; }
+    private string? SymbolInput { get; set; }
     private async Task GetDataAndRender()
     {
-        HistBars BaseData = await SData.GetHistBarData(SymbolInput, TimeFrame, DateTimeExtensions.ToRFC3339(StartDate), DateTimeExtensions.ToRFC3339(Date), 1000, "raw", "sip", "asc");
-        HistBarsEntries = BaseData.Bars[SymbolInput];
-        await chart.RenderAsync();
+        try
+        {
+            HistBars baseData = await SData.GetHistBarData(SymbolInput, TimeFrame, DateTimeExtensions.ToRFC3339(StartDate), DateTimeExtensions.ToRFC3339(Date), 1000, "raw", "sip", "asc");
+            HistBarEntries = baseData.Bars[SymbolInput];
+            await _mainChart.RenderAsync();
+        }
+        catch (Exception e)
+        {
+            ErrMessage = e.ToString();
+            Console.WriteLine(e);
+            throw;
+        }
+
     }
     
-    
-    private string SymbolInput { get; set; }
+    public List<ValDate>? MovingAverage { get; set; }
 
+    public void CalculateSMA()
+    {
+        @*takes average over abt 1/7 of total num of close prices*@
+        var len = HistBarEntries.Count();
+        var period = double.Round(len / 7.3);
+
+        List<ValDate> ClosePrices = new List<ValDate>();
+
+        foreach (HistBarsEntry histBarEntry in HistBarEntries)
+        {
+            ValDate closeprice = new ValDate();
+            closeprice.Date = histBarEntry.Time;
+            closeprice.Val = Decimal.ToDouble(histBarEntry.Close);
+            ClosePrices.Add(closeprice);
+        }
+        
+        @*
+        double[] closePrices = new double[len];
+        for (int i = 0; i < len; i++)
+        {
+            closePrices[i] = Decimal.ToDouble(HistBarsEntries[i].Close);
+        }
+        *@
+
+
+    }
+    
+
+
+    
+    
     public string TimeFrame { get; set; } = "1H";
 
     public void SetTimeFrame(string frame)
@@ -126,6 +173,8 @@
         TimeFrame = frame;
     }
 
+    
+    
     public DateTime StartDate { get; set; } = DateTime.Today.AddMonths(-1);
 
     public void SetStartDate(string timestring)
@@ -151,6 +200,8 @@
        
     }
     
+    
+    
     DateTime Date = DateTime.Today;
 
     public static class DateTimeExtensions
@@ -160,12 +211,7 @@
             return date.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.fffK");
         }
     }
-
-    public string RemoveLastChar(string input)
-    {
-        return input.Remove(input.Length - 1);
-    }
-
+    
     private DateTime PrevDateTime { get; set; } = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     private string FormatDateTime(DateTime currDateTime)
@@ -182,17 +228,16 @@
             return (currDateTime.ToString("t", CultureInfo.CreateSpecificCulture("es-ES")));
         }
     }
+    
+    public string? ErrMessage { get; set; }
+    
     @*
-    public string DateTimeToUnixTimestamp(DateTime input)
-    {
-        TimeSpan timeSpan = input - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        return timeSpan.TotalSeconds.ToString();
-    }
+Things to implement:
 
-    public DateTime UnixTimestampToDateTime(string input)
-    {
-        DateTime zerodate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        return zerodate.AddSeconds(long.Parse(input));
-    }
+Volume
+Volume Weighted Average Price (VWAP)
+Moving Average
+Relative Strength Index (RSI)
+
 *@
 }

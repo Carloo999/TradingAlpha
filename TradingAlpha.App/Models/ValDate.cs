@@ -2,7 +2,7 @@
 
 public class ValDate
 {
-    public float Val { get; set; }
+    public double Val { get; set; }
         
     public DateTime Date { get; set; }
 }
