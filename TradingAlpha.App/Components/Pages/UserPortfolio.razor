@@ -1,5 +1,11 @@
-﻿@page "/UserPortfolio" /* Wenn User eigenes Portfolio öffnen will*/
+@page "/UserPortfolio" /* Wenn User eigenes Portfolio öffnen will*/
 @page "/UserPortfolio/{Username}" /* Wenn User fremdes oder eigenes Portfolio öffnen will*/
+
+@inject IPortfolioManager Portfolio
+@inject ITransactionManager Transaction
+@inject IApplicationUserManager UserManager
+@inject AuthenticationStateManager AuthState
+@inject UserManager<ApplicationUser> TempUser
 
 <html> 
 <head>
@@ -12,7 +18,7 @@
     </div>
 </div>
 
-<head>
+</head>
 
 <body> 
 
@@ -40,5 +46,42 @@
 </html>
 
 @code {
-    
+    public ApplicationUser? User {get;set;}
+    public ApplicationUser? Owner {get;set;}
+    [Parameter]
+    public string Username {get;set;} = string.Empty;
+    private bool _authorized;
+    private bool _editable;
+
+    protected override async Task OnInitializedAsync() {
+      await GetUsers();
+      if(Owner != null) {
+        (_authorized,_editable) = await UserManager.GetIsAuthorized(Owner,User);
+      }
+    }
+
+    private async Task<ApplicationUser?> GetCurrentUser() {
+      AuthenticationState auth = await AuthState.GetAuthenticationStateAsync();
+      return UserManager.GetUserByAuthState(auth);
+    }
+
+    private async Task GetUsers() {
+      if (string.IsNullOrEmpty(Username)){
+        User = await getCurrentUser();
+        if (User != null) {
+          Username = User.Id.ToString();
+          Owner = User;
+        } 
+        else {
+          //Message
+        }
+      }
+      else {
+        Owner = await TempUser.FindByIdAsync(Username);
+        user = await GetCurrentUser();
+        if(Owner == null) {
+          //Message
+        }
+      }
+    }
 }
