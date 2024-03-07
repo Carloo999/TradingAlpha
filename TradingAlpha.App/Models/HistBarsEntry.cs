@@ -24,7 +24,7 @@ public class HistBarsEntry
    public DateTime Time { get; set; }
 
    [JsonProperty(PropertyName = "v")]
-   public long Volume { get; set; }
+   public decimal Volume { get; set; }
    
    [JsonProperty(PropertyName = "vw")]
    public decimal VolumeWeighted { get; set; }

@@ -9,10 +9,12 @@ namespace TradingAlpha.App.Services;
 
 public class PortfolioManager(
     ApplicationDbContext db,
-    ILoggerFactory loggerFactory) 
+    ILoggerFactory loggerFactory,
+    IStockDataService stockData,
+    ICryptoDataService cryptoData) 
     : IPortfolioManager
 {
-    private ILogger<PortfolioManager> logger = loggerFactory.CreateLogger<PortfolioManager>();
+    private readonly ILogger<PortfolioManager> _logger = loggerFactory.CreateLogger<PortfolioManager>();
 
     public async Task ChangeEntryForBuyTransaction(Transaction transaction)
     {
@@ -52,7 +54,7 @@ public class PortfolioManager(
             }
             else
             {
-                logger.LogCritical("Db failure! Multiple portfolio entries for same stock");
+                _logger.LogCritical("Db failure! Multiple portfolio entries for same stock");
             }
         }
 
@@ -92,7 +94,7 @@ public class PortfolioManager(
             }
             else
             {
-                logger.LogCritical("Db failure! Multiple portfolio entries for same crypto");
+                _logger.LogCritical("Db failure! Multiple portfolio entries for same crypto");
             }
         }
     }
@@ -131,9 +133,23 @@ public class PortfolioManager(
         return entries.Where(e => e is CryptoEntry).Cast<CryptoEntry>().ToArray();
     }
 
-    public Task UpdateAllPricesInPort(ApplicationUser user)
+    public async Task UpdateAllPricesInPort(ApplicationUser user)
     {
-        throw new NotImplementedException();
+        var stockEntries = await GetStockEntries(user);
+
+        foreach (var stockEntry in stockEntries)
+        {
+            stockEntry.CurrentPrice = await stockData.GetLatestBar(stockEntry.Symbol, "EUR");
+            stockEntry.LastUpdate = DateTime.Now;
+        }
+        
+        var cryptoEntries =  await GetCryptoEntries(user);
+
+        foreach (var cryptoEntry in cryptoEntries)
+        {
+            cryptoEntry.CurrentPrice = await cryptoData.GetLatestBar(cryptoEntry.Name);
+            cryptoEntry.LastUpdate = DateTime.Now;
+        }
     }
 
     public async Task<List<PortfolioEntry>> GetUserPortfolioEntries(ApplicationUser user)
