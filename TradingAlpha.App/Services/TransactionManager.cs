@@ -101,7 +101,19 @@ public class TransactionManager
             await db.SaveChangesAsync();
         }
     }
-    
+
+    public StockTransaction[] GetStockTransactions(ApplicationUser user)
+    {
+        var entries = db.StockTransactions.Where(x => x.User.Equals(user));
+        return entries.Cast<StockTransaction>().ToArray();
+    }
+
+    public CryptoTransaction[] GetCryptoTransactions(ApplicationUser user)
+    {
+        var entries = db.CryptoTransactions.Where(x => x.User.Equals(user));
+        return entries.Cast<CryptoTransaction>().ToArray();
+    }
+
     private async Task<decimal> CheckForBuyValidity(ApplicationUser user, BaseDataType type, decimal amount, string symbol)
     {
         decimal currentPrice = type switch
