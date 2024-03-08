@@ -1,9 +1,17 @@
-﻿.container {
+﻿#BuySellModalFooter {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.container {
     border: 3px rgba(15, 194, 192, 0.3);
     border-radius: 15px;
     border-style: solid;
     padding: 10px;;
 }
+
+
 
 .background {background: #121212;}
 .accent1 {background: #023535}

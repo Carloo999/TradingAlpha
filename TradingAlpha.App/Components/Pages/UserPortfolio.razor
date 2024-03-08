@@ -11,6 +11,30 @@
 
 <title>Portfolio</title>
 
+<div id="BuySellModal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+           <button type="button" class="btn btn-primary">Sell</button>
+          <input type="number" id="numericInput" name="numericInput" min="/* TO DO */" step="1">
+           <button type="button" class="btn btn-primary">Buy</button>
+      </div>
+      <div class="modal-footer" id="BuySellModalFooter">
+        <button type="button" class="btn btn-primary">Buy x10</button>
+        <button type="button" class="btn btn-primary">Buy x1</button>
+        <button type="button" class="btn btn-primary">Sell x1</button>
+        <button type="button" class="btn btn-primary">Sell x1ß</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="container">
     <div class="row" id="TopBar">
         <h3>User Portfolio</h3>
@@ -35,6 +59,10 @@
             <th>Price</th>
             <th>Amount</th>
             <th>Value</th>
+            @if (_editable)
+            {
+                <th>Buy/Sell</th>
+            }
         </tr>
     </thead>
 
@@ -48,6 +76,10 @@
                     <td>@stockEntry.CurrentPrice</td>
                     <td>@stockEntry.Amount</td>
                     <td>@(stockEntry.Amount * stockEntry.CurrentPrice)</td>
+                    @if (_editable)
+                    {
+                        <td> <button type="button" data-toggle="modal" data-target="#BuySellModal">Buy/Sell</button> </td>
+                    }
                 </tr>
             }
         }
