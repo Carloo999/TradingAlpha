@@ -5,11 +5,9 @@
 @inject ITransactionManager Transaction
 @inject IApplicationUserManager UserManager
 @inject AuthenticationStateManager AuthState
-@inject UserManager<ApplicationUser> TempUser
 
 <html> 
 <head>
-    <link rel="stylesheet" href="../wwwroot/css/style.css">
 <title> Portfolio </title>
 
 <div class="container"> 
@@ -24,24 +22,34 @@
 
     <div class="container"> 
 
+/* Button to switch Stock/Crypto mode */
+
 <table class="table">
   <thead>
     <tr>
-        <th> Ticker </th>
+        @if (inStockMode) {<th> Ticker </th>} else {<th> Kürzel </th>}
         <th> Stockprice </th>
         <th> # of Stocks owned </th>
         <th> Value of Stocks owned </th>
-        <th>  </th>
     </tr>
   </thead>
   <tbody>
-    @foreach (StockEntry stockentry in StockEntry) {
+    @if (inStockMode) {
+        foreach (StockEntry stockentry in StockEntry) {
             <tr>
                 <td>@stockentry.Symbol</td>
                 <td>@stockentry.CurrentPrice</td>
                 <td>@stockentry.Amount</td>
                 <td>@stockentry.Amount * stockentry.CurrentPrice</td>
             </tr>
+        } else {
+            foreach (CryptoEntry cryptoentry in CryptoEntry) {
+                <tr>
+                    <td>@cryptoentry.Symbol</td>
+                    <td>@cryptoentry.CurrentPrice</td>
+                    <td>@cryptoentry.Amount</td>
+                    <td>@cryptoentry.Amount * cryptoentry.CurrentPrice</td>
+                }
         }
   </tbody>
 </table>
@@ -53,6 +61,7 @@
 </html>
 
 @code {
+    public bool inStockMode = true;
     public ApplicationUser? User {get;set;}
     public ApplicationUser? Owner {get;set;}
     [Parameter]
@@ -66,10 +75,11 @@
         (_authorized,_editable) = await UserManager.GetIsAuthorized(Owner,User);
       }
     StockEntry = await Portfolio.GetStockEntries();
-    }
+    CryptoEntry = await Potfolio.GetCryptoEntries();
+}
 
     private async Task<ApplicationUser?> GetCurrentUser() {
-      AuthenticationState auth = await AuthEntrState.GetAuthenticationStateAsync();
+      AuthenticationState auth = await AuthState.GetAuthenticationStateAsync();
       return UserManager.GetUserByAuthState(auth);
     }
 
@@ -85,7 +95,7 @@
         }
       }
       else {
-        Owner = await TempUser.FindByIdAsync(Username);
+        Owner = await UserManager.FindByIdAsync(Username);
         user = await GetCurrentUser();
         if(Owner == null) {
           //Message
