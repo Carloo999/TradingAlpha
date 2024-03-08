@@ -35,12 +35,12 @@
     </tr>
   </thead>
   <tbody>
-    @foreach (StockEntry stockentry in StockEntry[]) {
+    @foreach (StockEntry stockentry in StockEntry) {
             <tr>
-                <td>@stockentry.</td>
-                <td>@stockentry.</td>
-                <td>@stockentry.</td>
-                <td>@stockentry.</td>
+                <td>@stockentry.Symbol</td>
+                <td>@stockentry.CurrentPrice</td>
+                <td>@stockentry.Amount</td>
+                <td>@stockentry.Amount * stockentry.CurrentPrice</td>
             </tr>
         }
   </tbody>
@@ -65,10 +65,11 @@
       if(Owner != null) {
         (_authorized,_editable) = await UserManager.GetIsAuthorized(Owner,User);
       }
+    StockEntry = await Portfolio.GetStockEntries();
     }
 
     private async Task<ApplicationUser?> GetCurrentUser() {
-      AuthenticationState auth = await AuthState.GetAuthenticationStateAsync();
+      AuthenticationState auth = await AuthEntrState.GetAuthenticationStateAsync();
       return UserManager.GetUserByAuthState(auth);
     }
 
