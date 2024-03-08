@@ -1,105 +1,128 @@
-@page "/UserPortfolio" /* Wenn User eigenes Portfolio öffnen will*/
-@page "/UserPortfolio/{Username}" /* Wenn User fremdes oder eigenes Portfolio öffnen will*/
+@page "/UserPortfolio"
+@page "/UserPortfolio/{Username}"
+@using TradingAlpha.App.Services.Interfaces
+@using TradingAlpha.App.Models.EntryTypes
+@using TradingAlpha.App.Data
 
-@inject IPortfolioManager Portfolio
-@inject ITransactionManager Transaction
+@inject IPortfolioManager PortfolioManager
+@inject ITransactionManager TransactionManager
 @inject IApplicationUserManager UserManager
-@inject AuthenticationStateManager AuthState
+@inject AuthenticationStateProvider AuthStateProvider
 
-<html> 
-<head>
-<title> Portfolio </title>
+<title>Portfolio</title>
 
-<div class="container"> 
-    <div class="row" id="Top Bar">
-        <h3> UserPortfolio </h3>
+<div class="container">
+    <div class="row" id="TopBar">
+        <h3>User Portfolio</h3>
     </div>
 </div>
 
-</head>
-
-<body> 
-
-    <div class="container"> 
-
-/* Button to switch Stock/Crypto mode */
+<div class="container">
+    <button class="btn btn-primary" @onclick="ToggleMode">Switch Mode</button>
+</div>
 
 <table class="table">
-  <thead>
-    <tr>
-        @if (inStockMode) {<th> Ticker </th>} else {<th> Kürzel </th>}
-        <th> Stockprice </th>
-        <th> # of Stocks owned </th>
-        <th> Value of Stocks owned </th>
-    </tr>
-  </thead>
-  <tbody>
-    @if (inStockMode) {
-        foreach (StockEntry stockentry in StockEntry) {
-            <tr>
-                <td>@stockentry.Symbol</td>
-                <td>@stockentry.CurrentPrice</td>
-                <td>@stockentry.Amount</td>
-                <td>@stockentry.Amount * stockentry.CurrentPrice</td>
-            </tr>
-        } else {
-            foreach (CryptoEntry cryptoentry in CryptoEntry) {
+    <thead>
+        <tr>
+            @if (_inStockMode)
+            {
+                <th>Ticker</th>
+            }
+            else
+            {
+                <th>Name</th>
+            }
+            <th>Price</th>
+            <th>Amount</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (_inStockMode)
+        {
+            foreach (var stockEntry in _stockEntries)
+            {
                 <tr>
-                    <td>@cryptoentry.Symbol</td>
-                    <td>@cryptoentry.CurrentPrice</td>
-                    <td>@cryptoentry.Amount</td>
-                    <td>@cryptoentry.Amount * cryptoentry.CurrentPrice</td>
-                }
+                    <td>@stockEntry.Symbol</td>
+                    <td>@stockEntry.CurrentPrice</td>
+                    <td>@stockEntry.Amount</td>
+                    <td>@(stockEntry.Amount * stockEntry.CurrentPrice)</td>
+                </tr>
+            }
         }
-  </tbody>
+        else
+        {
+            foreach (var cryptoEntry in _cryptoEntries)
+            {
+                <tr>
+                    <td>@cryptoEntry.Name</td>
+                    <td>@cryptoEntry.CurrentPrice</td>
+                    <td>@cryptoEntry.Amount</td>
+                    <td>@(cryptoEntry.Amount * cryptoEntry.CurrentPrice)</td>
+                </tr>
+            }
+        }
+    </tbody>
 </table>
 
-    </div>
-
-</body>
-
-</html>
-
 @code {
-    public bool inStockMode = true;
-    public ApplicationUser? User {get;set;}
-    public ApplicationUser? Owner {get;set;}
-    [Parameter]
-    public string Username {get;set;} = string.Empty;
+    private bool _inStockMode = true;
+    private ApplicationUser? _user;
+    private ApplicationUser? _owner;
     private bool _authorized;
     private bool _editable;
+    private StockEntry[] _stockEntries;
+    private CryptoEntry[] _cryptoEntries;
 
-    protected override async Task OnInitializedAsync() {
-      await GetUsers();
-      if(Owner != null) {
-        (_authorized,_editable) = await UserManager.GetIsAuthorized(Owner,User);
-      }
-    StockEntry = await Portfolio.GetStockEntries();
-    CryptoEntry = await Potfolio.GetCryptoEntries();
-}
+    [Parameter] public string Username { get; set; } = string.Empty;
 
-    private async Task<ApplicationUser?> GetCurrentUser() {
-      AuthenticationState auth = await AuthState.GetAuthenticationStateAsync();
-      return UserManager.GetUserByAuthState(auth);
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUsers();
+        if (_owner != null)
+        {
+            (_authorized, _editable) = await UserManager.GetIsAuthorized(_owner, _user);
+        }
+
+        _stockEntries = await PortfolioManager.GetStockEntries(_owner);
+        _cryptoEntries = await PortfolioManager.GetCryptoEntries(_owner);
     }
 
-    private async Task GetUsers() {
-      if (string.IsNullOrEmpty(Username)){
-        User = await getCurrentUser();
-        if (User != null) {
-          Username = User.Id.ToString();
-          Owner = User;
-        } 
-        else {
-          //Message
+    private async Task<ApplicationUser?> GetCurrentUser()
+    {
+        AuthenticationState auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        return await UserManager.GetUserByAuthState(auth);
+    }
+
+    private async Task GetUsers()
+    {
+        if (string.IsNullOrEmpty(Username))
+        {
+            _user = await GetCurrentUser();
+            if (_user != null)
+            {
+                Username = _user.Id;
+                _owner = _user;
+            }
+            else
+            {
+                // Message
+            }
         }
-      }
-      else {
-        Owner = await UserManager.FindByIdAsync(Username);
-        user = await GetCurrentUser();
-        if(Owner == null) {
-          //Message
+        else
+        {
+            _owner = await UserManager.GetUserById(Username);
+            _user = await GetCurrentUser();
+            if (_owner == null)
+            {
+                // Message
+            }
         }
-      }
+    }
+
+    private void ToggleMode()
+    {
+        _inStockMode = !_inStockMode;
     }
 }
