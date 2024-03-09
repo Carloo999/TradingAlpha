@@ -8,6 +8,15 @@ main {
     flex: 1;
 }
 
+.not-selectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .sidebar {
     background-image: linear-gradient(180deg, black 0%, rgb(34, 255, 243) 70%);
 }

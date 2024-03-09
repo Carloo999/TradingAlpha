@@ -3,7 +3,7 @@
 @inject NavigationManager NavigationManager
 
 <div class="ps-3 navbar navbar-dark">
-    <img src="Assets/logo.svg" class="img-fluid p-3 align-content-center pe-5" id="logo" alt="Logo"/>
+    <img src="Assets/logo_dark_mode.svg" class="img-fluid p-3 align-content-center pe-5" id="logo" alt="Logo"/>
 </div>
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
@@ -52,6 +52,13 @@
                 </div>
             </NotAuthorized>
         </AuthorizeView>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="about">
+                <img src="Assets/group-icon.svg" alt="about icon" class="img-fluid align-content-center me-3"/> About us
+            </NavLink>
+        </div>
+
     </nav>
 </div>
 
