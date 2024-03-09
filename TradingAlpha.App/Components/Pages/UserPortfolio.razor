@@ -3,6 +3,7 @@
 @using TradingAlpha.App.Services.Interfaces
 @using TradingAlpha.App.Models.EntryTypes
 @using TradingAlpha.App.Data
+@using TradingAlpha.App.Enums
 
 @inject IPortfolioManager PortfolioManager
 @inject ITransactionManager TransactionManager
@@ -29,7 +30,7 @@
         <button type="button" class="btn btn-primary">Buy x10</button>
         <button type="button" class="btn btn-primary">Buy x1</button>
         <button type="button" class="btn btn-primary">Sell x1</button>
-        <button type="button" class="btn btn-primary">Sell x1ß</button>
+        <button type="button" class="btn btn-primary" @onclick="TransactionManager.Sell(_owner, _type, 10,  /*(_type == BaseDataType.Stock) ? stockEntry.Symbol : cryptoEntry.Name*/">Sell x10</button>
       </div>
     </div>
   </div>
@@ -78,7 +79,7 @@
                     <td>@(stockEntry.Amount * stockEntry.CurrentPrice)</td>
                     @if (_editable)
                     {
-                        <td> <button type="button" data-toggle="modal" data-target="#BuySellModal">Buy/Sell</button> </td>
+/* Does @stockEntry.Symbol work? */ <td> <button type="button" data-SymbolName="@stockEntry.Symbol" data-toggle="modal" data-target="#BuySellModal">Buy/Sell</button> </td>
                     }
                 </tr>
             }
@@ -100,6 +101,7 @@
 
 @code {
     private bool _inStockMode = true;
+    private BaseDataType _type = BaseDataType.Stock;
     private ApplicationUser? _user;
     private ApplicationUser? _owner;
     private bool _authorized;
@@ -156,5 +158,6 @@
     private void ToggleMode()
     {
         _inStockMode = !_inStockMode;
+        _type = _type == BaseDataType.Stock ? BaseDataType.Crypto : BaseDataType.Stock;
     }
 }
