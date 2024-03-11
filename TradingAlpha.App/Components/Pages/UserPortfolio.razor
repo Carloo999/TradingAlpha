@@ -4,6 +4,7 @@
 @using TradingAlpha.App.Models.EntryTypes
 @using TradingAlpha.App.Data
 @using TradingAlpha.App.Enums
+@using TradingAlpha.App.Components.PageComponents
 
 @inject IPortfolioManager PortfolioManager
 @inject ITransactionManager TransactionManager
@@ -11,30 +12,6 @@
 @inject AuthenticationStateProvider AuthStateProvider
 
 <title>Portfolio</title>
-
-<div id="BuySellModal" class="modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-           <button type="button" class="btn btn-primary">Sell</button>
-          <input type="number" id="numericInput" name="numericInput" min="/* TO DO */" step="1">
-           <button type="button" class="btn btn-primary">Buy</button>
-      </div>
-      <div class="modal-footer" id="BuySellModalFooter">
-        <button type="button" class="btn btn-primary">Buy x10</button>
-        <button type="button" class="btn btn-primary">Buy x1</button>
-        <button type="button" class="btn btn-primary">Sell x1</button>
-        <button type="button" class="btn btn-primary" @onclick="TransactionManager.Sell(_owner, _type, 10,  /*(_type == BaseDataType.Stock) ? stockEntry.Symbol : cryptoEntry.Name*/">Sell x10</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="container">
     <div class="row" id="TopBar">
@@ -79,7 +56,7 @@
                     <td>@(stockEntry.Amount * stockEntry.CurrentPrice)</td>
                     @if (_editable)
                     {
-/* Does @stockEntry.Symbol work? */ <td> <button type="button" data-SymbolName="@stockEntry.Symbol" data-toggle="modal" data-target="#BuySellModal">Buy/Sell</button> </td>
+                        <td> <EditModal _type="BaseDataType.Stock" _NameSymbol="@stockEntry.Symbol"/> </td>
                     }
                 </tr>
             }
@@ -93,6 +70,10 @@
                     <td>@cryptoEntry.CurrentPrice</td>
                     <td>@cryptoEntry.Amount</td>
                     <td>@(cryptoEntry.Amount * cryptoEntry.CurrentPrice)</td>
+                    @if (_editable)
+                                        {
+                                            <td> <EditModal _type="BaseDataType.Crypto" _NameSymbol="@cryptoEntry.Name"/> </td>
+                                        }
                 </tr>
             }
         }

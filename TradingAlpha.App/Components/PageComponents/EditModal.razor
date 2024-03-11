@@ -1,0 +1,37 @@
+@using TradingAlpha.App.Enums
+<h3>EditModal</h3>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#BuySellModal">
+  Launch demo modal
+</button>
+
+<div id="BuySellModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times</span>
+        </button>
+      </div>
+      <div class="modal-body">
+           <button type="button" class="btn btn-primary">Sell</button>
+          <input type="number" id="numericInput" name="numericInput" min="/* TO DO */" step="1">
+           <button type="button" class="btn btn-primary">Buy</button>
+      </div>
+      <div class="modal-footer" id="BuySellModalFooter">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Buy x1</button>
+        <button type="button" class="btn btn-primary">Sell All</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@code {
+  [Parameter]
+  public BaseDataType _type { get; set; }
+
+  [Parameter]
+  public string _NameSymbol { get; set; } = string.Empty;
+}

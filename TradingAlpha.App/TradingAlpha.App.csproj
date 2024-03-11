@@ -25,4 +25,9 @@
         <PackageReference Include="RestSharp" Version="110.2.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\PageComponents\BuyModal.razor" />
+      <_ContentIncludedByDefault Remove="Components\PageComponents\EditModal.razor" />
+    </ItemGroup>
+
 </Project>
