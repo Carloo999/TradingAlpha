@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <None Update="Data\app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+        <None Remove="wwwroot\css\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -28,6 +29,19 @@
     <ItemGroup>
       <_ContentIncludedByDefault Remove="Components\PageComponents\BuyModal.razor" />
       <_ContentIncludedByDefault Remove="Components\PageComponents\EditModal.razor" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\style.css" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="wwwroot\css\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="wwwroot\css\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="wwwroot\css\**" />
     </ItemGroup>
 
 </Project>

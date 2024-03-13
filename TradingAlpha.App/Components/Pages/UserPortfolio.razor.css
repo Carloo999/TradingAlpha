@@ -10,7 +10,9 @@
     padding: 10px;;
 }
 
-
+#ToggleModeButton{
+    background: yellow;
+}
 
 .background {background: #121212;}
 .accent1 {background: #023535}

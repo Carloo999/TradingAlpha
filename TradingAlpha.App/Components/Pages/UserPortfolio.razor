@@ -5,6 +5,8 @@
 @using TradingAlpha.App.Data
 @using TradingAlpha.App.Enums
 @using TradingAlpha.App.Components.PageComponents
+@using TradingAlpha.App.Models.TransactionTypes
+@using System.Globalization
 
 @inject IPortfolioManager PortfolioManager
 @inject ITransactionManager TransactionManager
@@ -20,63 +22,115 @@
 </div>
 
 <div class="container">
-    <button class="btn btn-primary" @onclick="ToggleMode">Switch Mode</button>
+    <button class="btn btn-primary" id="ToggleModeButton" @onclick="ToggleMode">  @(_type == BaseDataType.Stock ? "Stock" : "Crypto") </button>
+    <BuyNewModal _owner="@_owner"/>
+    <button class="btn btn-primary" id="UpdateButton" @onclick="() => PortfolioManager.UpdateAllPricesInPort(_owner)">Update Prices</button>
 </div>
 
 <table class="table">
     <thead>
-        <tr>
-            @if (_inStockMode)
-            {
-                <th>Ticker</th>
-            }
-            else
-            {
-                <th>Name</th>
-            }
-            <th>Price</th>
-            <th>Amount</th>
-            <th>Value</th>
-            @if (_editable)
-            {
-                <th>Buy/Sell</th>
-            }
-        </tr>
-    </thead>
-
-    <tbody>
+    <tr>
         @if (_inStockMode)
         {
-            foreach (var stockEntry in _stockEntries)
-            {
-                <tr>
-                    <td>@stockEntry.Symbol</td>
-                    <td>@stockEntry.CurrentPrice</td>
-                    <td>@stockEntry.Amount</td>
-                    <td>@(stockEntry.Amount * stockEntry.CurrentPrice)</td>
-                    @if (_editable)
-                    {
-                        <td> <EditModal _type="BaseDataType.Stock" _NameSymbol="@stockEntry.Symbol"/> </td>
-                    }
-                </tr>
-            }
+            <th>Ticker</th>
         }
         else
         {
-            foreach (var cryptoEntry in _cryptoEntries)
-            {
-                <tr>
-                    <td>@cryptoEntry.Name</td>
-                    <td>@cryptoEntry.CurrentPrice</td>
-                    <td>@cryptoEntry.Amount</td>
-                    <td>@(cryptoEntry.Amount * cryptoEntry.CurrentPrice)</td>
-                    @if (_editable)
-                                        {
-                                            <td> <EditModal _type="BaseDataType.Crypto" _NameSymbol="@cryptoEntry.Name"/> </td>
-                                        }
-                </tr>
-            }
+            <th>Name</th>
         }
+        <th>Price</th>
+        <th>Amount</th>
+        <th>Value</th>
+        @if (_editable)
+        {
+            <th>Buy/Sell</th>
+        }
+    </tr>
+    </thead>
+
+    <tbody>
+    @if (_inStockMode)
+    {
+        foreach (var stockEntry in _stockEntries)
+        {
+            <tr>
+                <td>@stockEntry.Symbol</td>
+                <td>@stockEntry.CurrentPrice</td>
+                <td>@stockEntry.Amount</td>
+                <td>@(stockEntry.Amount * stockEntry.CurrentPrice)</td>
+                @if (_editable)
+                {
+                    <td> <EditModal _owner="@_owner" _amountOwned="@stockEntry.Amount" _type="BaseDataType.Stock" _NameSymbol="@stockEntry.Symbol"/> </td>
+                }
+            </tr>
+        }
+    }
+    else
+    {
+        foreach (var cryptoEntry in _cryptoEntries)
+        {
+            <tr>
+                <td>@cryptoEntry.Name</td>
+                <td>@cryptoEntry.CurrentPrice</td>
+                <td>@cryptoEntry.Amount</td>
+                <td>@(cryptoEntry.Amount * cryptoEntry.CurrentPrice)</td>
+                @if (_editable)
+                {
+                    <td> <EditModal _owner="@_owner" _amountOwned="@cryptoEntry.Amount" _type="BaseDataType.Crypto" _NameSymbol="@cryptoEntry.Name"/> </td>
+                }
+            </tr>
+        }
+    }
+    </tbody>
+</table>
+
+<p>Transactions</p>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Time</th>
+        @if (_inStockMode)
+        {
+            <th>Ticker</th>
+        }
+        else
+        {
+            <th>Name</th>
+        }
+        <th>At Price</th>
+        <th>Amount</th>
+        <th>Value</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    @if (_inStockMode)
+    {
+        foreach (var transaction in _stockTransactions)
+        {
+            <tr>
+                <td>@transaction.Timestamp.ToString("dd.MM.yyyy HH:mm:ss", CultureInfo.GetCultureInfo("de-DE"))</td>
+                <td>@transaction.Symbol</td>
+                <td>@transaction.AtPrice</td>
+                <td>@transaction.Amount</td>
+                <td>@(transaction.Amount * transaction.AtPrice)</td>
+            </tr>
+        }
+    }
+    else
+    {
+        foreach (var transaction in _cryptoTransactions)
+        {
+            <tr>
+                <td>@transaction.Timestamp.ToString("dd.MM.yyyy HH:mm:ss", CultureInfo.GetCultureInfo("de-DE"))</td>
+                <td>@transaction.Name</td>
+                <td>@transaction.AtPrice</td>
+                <td>@transaction.Amount</td>
+                <td>@(transaction.Amount * transaction.AtPrice)</td>
+            </tr>
+        }
+    }
     </tbody>
 </table>
 
@@ -89,6 +143,8 @@
     private bool _editable;
     private StockEntry[] _stockEntries;
     private CryptoEntry[] _cryptoEntries;
+    private StockTransaction[] _stockTransactions;
+    private CryptoTransaction[] _cryptoTransactions;
 
     [Parameter] public string Username { get; set; } = string.Empty;
 
@@ -102,6 +158,8 @@
 
         _stockEntries = await PortfolioManager.GetStockEntries(_owner);
         _cryptoEntries = await PortfolioManager.GetCryptoEntries(_owner);
+        _stockTransactions = TransactionManager.GetStockTransactions(_owner);
+        _cryptoTransactions = TransactionManager.GetCryptoTransactions(_owner);
     }
 
     private async Task<ApplicationUser?> GetCurrentUser()
@@ -136,9 +194,21 @@
         }
     }
 
-    private void ToggleMode()
+    private async void ToggleMode()
     {
         _inStockMode = !_inStockMode;
         _type = _type == BaseDataType.Stock ? BaseDataType.Crypto : BaseDataType.Stock;
+        
+        if (_inStockMode)
+        {
+            _stockEntries = await PortfolioManager.GetStockEntries(_owner);
+            _stockTransactions = TransactionManager.GetStockTransactions(_owner);
+        }
+        else
+        {
+            _cryptoEntries = await PortfolioManager.GetCryptoEntries(_owner);
+            _cryptoTransactions = TransactionManager.GetCryptoTransactions(_owner);
+        }
+        StateHasChanged();
     }
 }
