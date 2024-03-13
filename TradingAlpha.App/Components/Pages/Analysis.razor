@@ -15,13 +15,20 @@
 <PageTitle>Analysis</PageTitle>
 
 @* Search Bar *@
-<div class="input-group mb-3" id="symbol_input_group">
-    <input @bind="SymbolInput" type="text" class="form-control" placeholder="Input crypto or stock symbol" aria-label="Symbol" aria-describedby="basic-addon2" id="SymbolSearch">
-    <div class="input-group-append">
-        <button class="btn btn-outline-secondary" type="button" @onclick="GetDataAndRender" >Search</button>
+<div class="row justify-content-center">
+    <div class="col">
+        <div class="input-group mb-3" id="symbol_input_group">
+            <div class="input-group-prepend">
+             <button class="btn btn-outline-dark" type="button" @onclick="SwitchService" id="Services" style="@ButtonColor">@CurService </button>   
+            </div>
+            <input @bind="SymbolInput" type="text" class="form-control" placeholder="Input crypto or stock symbol" aria-label="Symbol" aria-describedby="basic-addon2" id="SymbolSearch">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" @onclick="GetDataAndRender">Search</button>
+            </div>
+            
+        </div>
     </div>
 </div>
-
 @*Graph and indicators*@
 <div class="row">
     @* Graph *@
@@ -30,26 +37,52 @@
              align="left"
              id="Chart">
             <ApexChart @ref=_mainChart TItem="HistBarsEntry"
+                       XAxisType="XAxisType.Category"
                        Height="@("100%")"
-                       Debug>
-                @*
-                <ApexPointSeries TItem="MyData"
-                                 Items="Data"
-                                 Name="Net Profit"
-                                 SeriesType="SeriesType.Bar"
-                                 XValue="e => e.Category"
-                                 YValue="e => e.NetProfit"/>*@
+                       Debug    
+                       Options=_options
+            >
+
                 
                 <ApexCandleSeries TItem="HistBarsEntry"
                                   Items="HistBarEntries"
-                                  Name="Apex Stock Price"
-                                  XValue="@(e => FormatDateTime(e.Time))"
+                                  Name="Stock Prices"
+                                  XValue="@(e => e.Time)"
                                   Open="@(e => e.Open)"
                                   High="@(e => e.High)"
                                   Low="@(e => e.Low)"
                                   Close="@(e => e.Close)"
+                                  Stroke="@(new SeriesStroke{ Width=1 })"
                 />
                 
+                <ApexPointSeries    TItem="HistBarsEntry"
+                                    Items="HistBarEntries"
+                                    Name="SMA"
+                                    SeriesType="SeriesType.Line"
+                                    XValue="@(e => e.Time)"
+                                    YAggregate="@(e => e.Average(e => e.SMA))"
+                                    Stroke="@(new SeriesStroke{ Width = 3, Color = "#ff0000"})"
+                />
+
+                <ApexPointSeries    TItem="HistBarsEntry"
+                                    Items="HistBarEntries"
+                                    Name="VWAP"
+                                    SeriesType="SeriesType.Line"
+                                    XValue="@(e => e.Time)"
+                                    YAggregate="@(e => e.Average(e => e.VolumeWeighted))"
+                                    Stroke="@(new SeriesStroke{ Width = 3, Color = "#ff00c3"})"
+                />
+                
+                <ApexPointSeries
+                    TItem="HistBarsEntry"
+                    Items="HistBarEntries"
+                    Name="Volume"
+                    SeriesType="SeriesType.Line"
+                    XValue="@(e => e.Time)"
+                    YAggregate="@(e => e.Average(e => Convert.ToDecimal(e.Volume)))"
+                    Stroke="@(new SeriesStroke{ Width = 3, Color = "#8900bf"})"
+                />        
+
             </ApexChart>
         </div>
     </div>
@@ -60,19 +93,19 @@
         <div class="container" id="FrameStartDate">
             <h5>Bar width</h5>
             <div class="btn-group btn-group-sm" role="group" aria-label="TimeFrame">
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1min"))">1min</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("15min"))">15min</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1H"))">Hour</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1D"))">Day</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1M"))">Month</button>
+                <button type="button" class="btn btn-info" @onclick="@(() => SetTimeFrame("1min"))">1min</button>
+                <button type="button" class="btn btn-info" @onclick="@(() => SetTimeFrame("15min"))">15min</button>
+                <button type="button" class="btn btn-info" @onclick="@(() => SetTimeFrame("1H"))">Hour</button>
+                <button type="button" class="btn btn-info" @onclick="@(() => SetTimeFrame("1D"))">Day</button>
+                <button type="button" class="btn btn-info" @onclick="@(() => SetTimeFrame("1M"))">Month</button>
             </div>
             <h5>Timeframe</h5>
             <div class="btn-group btn-group-sm" role="group" aria-label="StartDate">
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("1D"))">1D</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("1M"))">1M</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("6M"))">6M</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("1Y"))">1Y</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("5Y"))">5Y</button>
+                <button type="button" class="btn btn-info" @onclick="@(() => SetStartDate("1D"))">1D</button>
+                <button type="button" class="btn btn-info" @onclick="@(() => SetStartDate("1M"))">1M</button>
+                <button type="button" class="btn btn-info" @onclick="@(() => SetStartDate("6M"))">6M</button>
+                <button type="button" class="btn btn-info" @onclick="@(() => SetStartDate("1Y"))">1Y</button>
+                <button type="button" class="btn btn-info" @onclick="@(() => SetStartDate("5Y"))">5Y</button>
             </div>
         </div>
         
@@ -81,21 +114,21 @@
             <h5>Indicators</h5>
 
             <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="Volume">
+                <input class="form-check-input" type="checkbox" @onchange="ToggleVolume" role="switch" id="Volume">
                 <label class="form-check-label" title="Trading Volume" for="Volume">
                     Volume
                 </label>
             </div>
 
             <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="VWAP">
+                <input class="form-check-input" type="checkbox" @onchange="ToggleVWAP" role="switch" id="VWAP">
                 <label class="form-check-label" title="Volume Weighted Average Price" for="VWAP">
                     VWAP
                 </label>
             </div>
 
             <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="SMA">
+                <input class="form-check-input" type="checkbox" @onchange="ToggleSMA" role="switch" id="SMA">
                 <label class="form-check-label" title="Simple Moving Average" for="SMA">
                     SMA
                 </label>
@@ -113,58 +146,190 @@
 <p>@ErrMessage</p>
 
 @code {
+    public string CurService { get; set; } = "Stock";
+    public string ButtonColor { get; set; } = "background-color: darkorchid;";
+    
+    public void SwitchService()
+    {
+        switch (CurService)
+        {   
+            case "Stock": 
+                CurService = "Crypto";
+                ButtonColor = "background-color: #d63384;";
+                break;
+            case "Cryto": 
+                CurService = "Stock";
+                ButtonColor = "background-color: darkorchid;";
+                break;
+            default: 
+                CurService = "Stock";
+                ButtonColor = "background-color: darkorchid;";
+                break;
+         }
+
+        ;
+    }
+    
     private ApexChart<HistBarsEntry> _mainChart;
     public List<HistBarsEntry>? HistBarEntries { get; set; }
+    public int MaxPrice { get; set; }
+    public int MinPrice { get; set; }
     private string? SymbolInput { get; set; }
+    
+    private ApexChartOptions<HistBarsEntry> _options = new();
+
+    protected override void OnInitialized()
+    {
+        _options.Yaxis = new List<YAxis>();
+
+        _options.Yaxis.Add(new YAxis
+        {
+            Title = new AxisTitle { Text = "Price" },
+            SeriesName = "SMA",
+            DecimalsInFloat = 0,
+            Max = MaxPrice,
+            Min = MinPrice,
+        });
+        _options.Yaxis.Add(new YAxis
+        {
+            Show = false,
+            SeriesName = "Stock Prices",
+            DecimalsInFloat = 0,
+            Max = MaxPrice,
+            Min = MinPrice,
+        });
+        
+        _options.Yaxis.Add(new YAxis
+        {
+            Show = false,
+            SeriesName = "VWAP",
+            DecimalsInFloat = 0,
+            Max = MaxPrice,
+            Min = MinPrice,
+        });
+        
+        _options.Yaxis.Add(new YAxis
+        {
+            Title = new AxisTitle { Text = "Volume" },
+            SeriesName = "Volume",
+            DecimalsInFloat = 0,
+            Opposite = true
+        });
+        
+    }
+
+    private bool StockService { get; set; }
     private async Task GetDataAndRender()
     {
         try
         {
-            HistBars baseData = await SData.GetHistBarData(SymbolInput, TimeFrame, DateTimeExtensions.ToRFC3339(StartDate), DateTimeExtensions.ToRFC3339(Date), 1000, "raw", "sip", "asc");
+            HistBars baseData = CurService switch
+            {
+                "Stock" => await SData.GetHistBarData(SymbolInput, TimeFrame, DateTimeExtensions.ToRFC3339(StartDate), DateTimeExtensions.ToRFC3339(Date), 1000, "raw", "sip", "asc"),
+                "Crypto" => await CData.GetHistBarData(SymbolInput, TimeFrame, DateTimeExtensions.ToRFC3339(StartDate), DateTimeExtensions.ToRFC3339(Date), 1000, "asc"),
+                _ => new HistBars()
+            };
+
             HistBarEntries = baseData.Bars[SymbolInput];
+            _options = new ApexChartOptions<HistBarsEntry>();
+            MaxPrice = getMaxPrice();
+            MinPrice = getMinPrice();
+            CalculateSMA();
+            OnInitialized();            
+
             await _mainChart.RenderAsync();
-        }
-        catch (Exception e)
-        {
-            ErrMessage = e.ToString();
-            Console.WriteLine(e);
-            throw;
-        }
-
-    }
-    
-    public List<ValDate>? MovingAverage { get; set; }
-
-    public void CalculateSMA()
-    {
-        @*takes average over abt 1/7 of total num of close prices*@
-        var len = HistBarEntries.Count();
-        var period = double.Round(len / 7.3);
-
-        List<ValDate> ClosePrices = new List<ValDate>();
-
-        foreach (HistBarsEntry histBarEntry in HistBarEntries)
-        {
-            ValDate closeprice = new ValDate();
-            closeprice.Date = histBarEntry.Time;
-            closeprice.Val = Decimal.ToDouble(histBarEntry.Close);
-            ClosePrices.Add(closeprice);
+            await ToggleSMA();
+            await ToggleVolume();
+            await ToggleVWAP();
         }
         
-        @*
-        double[] closePrices = new double[len];
-        for (int i = 0; i < len; i++)
+        catch (Exception e)
         {
-            closePrices[i] = Decimal.ToDouble(HistBarsEntries[i].Close);
+            ErrMessage = "Input valid symbol. Crypto symbol has to be [COIN SYMBOL]/[EXCHANGE CURRENCY]";
         }
-        *@
-
 
     }
-    
 
-
+    public async Task ToggleSMA()
+    {
+        await _mainChart.Series[1].Toggle();
+    }
     
+    public async Task ToggleVolume()
+    {
+        await _mainChart.Series[3].Toggle();
+    }
+
+    public async Task ToggleVWAP()
+    {
+        await _mainChart.Series[2].Toggle();
+    }
+    
+    public void CalculateSMA()
+    {
+        int len = HistBarEntries.Count();
+        int period = RoundToOdd(len/7.3);
+        int radius = (period - 1 )/ 2;
+        
+        for (int i = 0; i < len; i++)
+        {
+            int devisor = 0;
+            decimal sumPrices = 0;
+            for (int a = i - radius; a <= i + radius; a++)
+            {
+                if (a < 0 || a > len-1)
+                {
+                    continue;
+                }
+                sumPrices += HistBarEntries[a].Close;
+                devisor++;
+            }
+
+            HistBarEntries[i].SMA = sumPrices/devisor;
+        }
+
+    }
+
+    public int RoundToOdd(double num)
+    {
+        int numRounded = Convert.ToInt32(Math.Floor(num));
+        if (numRounded % 2 != 0)
+        {
+            return numRounded;
+        }
+        else
+        {
+            return numRounded += 1;
+        }
+    }
+
+    public int getMinPrice()
+    {
+        var min = HistBarEntries[0].Low;
+        foreach (var HistBarEntry in HistBarEntries)
+        { 
+            if (HistBarEntry.Low < min)
+            {
+                min = HistBarEntry.Low;
+            }
+        }
+
+        return Convert.ToInt32(System.Math.Floor(min));
+    }
+    
+    public int getMaxPrice()
+    {
+        var max = HistBarEntries[0].High;
+        foreach (var HistBarEntry in HistBarEntries)
+        { 
+            if (HistBarEntry.High > max)
+            {
+                max = HistBarEntry.High;
+            }
+        }
+
+        return Convert.ToInt32(System.Math.Ceiling(max));
+    }
     
     public string TimeFrame { get; set; } = "1H";
 

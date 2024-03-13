@@ -1,9 +1,15 @@
-﻿.container {
+﻿
+.container {
     border: 3px rgba(15, 194, 192,0.3);
     border-radius: 15px;
     border-style: solid;
     padding: 10px;;
 }
+#Services{
+    width: 75px;
+    
+}
+
 #FrameStartDate{
     margin-bottom: 10px;
 }
@@ -20,8 +26,14 @@
     height: 500px;
 }
 
+
+h5{
+    margin-bottom: -2px;
+}
+
+
 .btn-group{
-    padding: 10px;
+    margin-bottom: 10px;
     text-align: center; 
     width: 100%;
 }
@@ -32,3 +44,6 @@
 .accent3 {background: #008F8C}
 .accent4 {background: #0CABA0}
 .accent5 {background: #0FC2C0}
+.stock{background: #d63384 }
+.crypto{background: #9932cc
+}
