@@ -195,7 +195,7 @@
         }
     }
 
-    public async void ToggleMode()
+    private async void ToggleMode()
     {
         _inStockMode = !_inStockMode;
         _type = _type == BaseDataType.Stock ? BaseDataType.Crypto : BaseDataType.Stock;
@@ -214,7 +214,7 @@
 
     }
 
-    public async void UpdatePort()
+    private async void UpdatePort()
     {
         await PortfolioManager.UpdateAllPricesInPort(_owner);
         if (_inStockMode)
