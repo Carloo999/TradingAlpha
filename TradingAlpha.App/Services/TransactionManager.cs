@@ -11,9 +11,10 @@ public class TransactionManager
     (ApplicationDbContext db, 
         IPortfolioManager portfolioManager,
         IStockDataService stockData, 
-        ICryptoDataService cryptoData): ITransactionManager
+        ICryptoDataService cryptoData,
+        IDateTimeProvider dateTimeProvider): ITransactionManager
 {
-    public async Task Buy(ApplicationUser user, BaseDataType type, decimal amount, decimal price, string symbol)
+    public async Task Buy(ApplicationUser user, BaseDataType type, decimal amount, string symbol)
     {
         if (type == BaseDataType.Stock)
         {
@@ -21,7 +22,7 @@ public class TransactionManager
             
             var transaction = new StockTransaction
             {
-                Timestamp = DateTime.Now,
+                Timestamp = dateTimeProvider.Now,
                 Symbol = symbol,
                 Amount = amount,
                 AtPrice = currentPrice,
@@ -41,7 +42,7 @@ public class TransactionManager
             
             var transaction = new CryptoTransaction()
             {
-                Timestamp = DateTime.Now,
+                Timestamp = dateTimeProvider.Now,
                 Name = symbol,
                 Amount = amount,
                 AtPrice = currentPrice,
@@ -56,7 +57,7 @@ public class TransactionManager
         }
     }
 
-    public async Task Sell(ApplicationUser user, BaseDataType type, decimal amount, decimal price, string symbol)
+    public async Task Sell(ApplicationUser user, BaseDataType type, decimal amount, string symbol)
     {
         if (type == BaseDataType.Stock)
         {
@@ -64,7 +65,7 @@ public class TransactionManager
             
             var transaction = new StockTransaction
             {
-                Timestamp = DateTime.Now,
+                Timestamp = dateTimeProvider.Now,
                 Symbol = symbol,
                 Amount = amount,
                 AtPrice = currentPrice,
@@ -85,7 +86,7 @@ public class TransactionManager
 
             var transaction = new CryptoTransaction
             {
-                Timestamp = DateTime.Now,
+                Timestamp = dateTimeProvider.Now,
                 Name = symbol,
                 Amount = amount,
                 AtPrice = currentPrice,
@@ -100,7 +101,19 @@ public class TransactionManager
             await db.SaveChangesAsync();
         }
     }
-    
+
+    public StockTransaction[] GetStockTransactions(ApplicationUser user)
+    {
+        var entries = db.StockTransactions.Where(x => x.User.Equals(user));
+        return entries.Cast<StockTransaction>().ToArray();
+    }
+
+    public CryptoTransaction[] GetCryptoTransactions(ApplicationUser user)
+    {
+        var entries = db.CryptoTransactions.Where(x => x.User.Equals(user));
+        return entries.Cast<CryptoTransaction>().ToArray();
+    }
+
     private async Task<decimal> CheckForBuyValidity(ApplicationUser user, BaseDataType type, decimal amount, string symbol)
     {
         decimal currentPrice = type switch
