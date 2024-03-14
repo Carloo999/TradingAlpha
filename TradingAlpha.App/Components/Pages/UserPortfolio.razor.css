@@ -10,11 +10,11 @@
     padding: 10px;;
 }
 
-#ToggleModeButton{
+#ToggleModeButton :hover{
     background: yellow;
 }
 
-.background {background: #121212;}
+.background {background: #121212}
 .accent1 {background: #023535}
 .accent2 {background: #015958}
 .accent3 {background: #008F8C}

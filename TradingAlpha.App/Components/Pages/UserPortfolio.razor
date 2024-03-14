@@ -7,6 +7,7 @@
 @using TradingAlpha.App.Components.PageComponents
 @using TradingAlpha.App.Models.TransactionTypes
 @using System.Globalization
+@rendermode InteractiveServer
 
 @inject IPortfolioManager PortfolioManager
 @inject ITransactionManager TransactionManager
@@ -24,7 +25,7 @@
 <div class="container">
     <button class="btn btn-primary" id="ToggleModeButton" @onclick="ToggleMode">  @(_type == BaseDataType.Stock ? "Stock" : "Crypto") </button>
     <BuyNewModal _owner="@_owner"/>
-    <button class="btn btn-primary" id="UpdateButton" @onclick="() => PortfolioManager.UpdateAllPricesInPort(_owner)">Update Prices</button>
+    <button class="btn btn-primary" id="UpdateButton" @onclick="UpdatePort">Update</button>
 </div>
 
 <table class="table">
@@ -194,11 +195,28 @@
         }
     }
 
-    private async void ToggleMode()
+    public async void ToggleMode()
     {
         _inStockMode = !_inStockMode;
         _type = _type == BaseDataType.Stock ? BaseDataType.Crypto : BaseDataType.Stock;
         
+        if (_inStockMode)
+        {
+            _stockEntries = await PortfolioManager.GetStockEntries(_owner);
+            _stockTransactions = TransactionManager.GetStockTransactions(_owner);
+        }
+        else
+        {
+            _cryptoEntries = await PortfolioManager.GetCryptoEntries(_owner);
+            _cryptoTransactions = TransactionManager.GetCryptoTransactions(_owner);
+        }
+        StateHasChanged();
+
+    }
+
+    public async void UpdatePort()
+    {
+        await PortfolioManager.UpdateAllPricesInPort(_owner);
         if (_inStockMode)
         {
             _stockEntries = await PortfolioManager.GetStockEntries(_owner);
