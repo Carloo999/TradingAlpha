@@ -1,4 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@using TradingAlpha.App.Services.Interfaces
+@using TradingAlpha.App.Data
+@inherits LayoutComponentBase
+@inject IApplicationUserManager UserManager
+@inject AuthenticationStateProvider StateProvider
 
 <div class="page">
     <div class="sidebar">
@@ -6,8 +10,16 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <p class="text-info pt-3  not-selectable">Trading Alpha Inc.</p>
+        <div class="top-row d-flex align-items-center">
+            <AuthorizeView>
+                <Authorized>
+                    <h4 class="balance not-selectable">@_user?.Balance&euro;</h4>
+                </Authorized>
+                
+                <NotAuthorized>
+                    <h4 class="balance not-selectable">Trading Alpha Inc.</h4>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
 
         <article class="content px-4">
@@ -21,3 +33,13 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
+@code
+{
+    private ApplicationUser? _user;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _user = await UserManager.GetUserByAuthState(await StateProvider.GetAuthenticationStateAsync());
+    }
+}

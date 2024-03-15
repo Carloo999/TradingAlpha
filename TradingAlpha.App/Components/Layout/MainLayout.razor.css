@@ -17,6 +17,13 @@ main {
     user-select: none;
 }
 
+.balance {
+    color: #0FC2C0;
+    font-weight: bold;
+    font-size: 1.5vw;
+    margin-bottom: 0;
+}
+
 .sidebar {
     background-image: linear-gradient(180deg, black 0%, rgb(34, 255, 243) 70%);
 }
