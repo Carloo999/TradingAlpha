@@ -51,11 +51,11 @@
 
     private string? _errorMessage;
 
-    private void Sell(decimal amount)
+    private async Task Sell(decimal amount)
     {
         try
         {
-            Transaction.Sell(_owner, _type, amount, _nameSymbol);
+            await Transaction.Sell(_owner, _type, amount, _nameSymbol);
         }
         catch (Exception ex)
         {
@@ -63,11 +63,11 @@
         }
     }
     
-    private void Buy(decimal amount)
+    private async Task Buy(decimal amount)
     {
         try
         {
-            Transaction.Buy(_owner, _type, amount, _nameSymbol);
+            await Transaction.Buy(_owner, _type, amount, _nameSymbol);
         }
         catch (Exception ex)
         {

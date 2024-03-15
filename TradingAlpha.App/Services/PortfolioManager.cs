@@ -150,6 +150,8 @@ public class PortfolioManager(
             cryptoEntry.CurrentPrice = await cryptoData.GetLatestBar(cryptoEntry.Name);
             cryptoEntry.LastUpdate = DateTime.Now;
         }
+
+        await db.SaveChangesAsync();
     }
 
     public async Task<List<PortfolioEntry>> GetUserPortfolioEntries(ApplicationUser user)

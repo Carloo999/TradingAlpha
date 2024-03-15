@@ -18,33 +18,31 @@
                     <span aria-hidden="true">&times</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <label> <input type="radio" id="RadioStock" name="StockCryptoRadio" value="Stock" checked="@(_type == BaseDataType.Stock)" @onchange="() => _type = BaseDataType.Stock">Stock</label>
-                <label> <input type="radio" id="RadioCrypto" name="StockCryptoRadio" value="Crypto" checked="@(_type == BaseDataType.Crypto)" @onchange="() => _type = BaseDataType.Crypto">Crypto</label>
-                <input type="text" id="NameSymbol" placeholder="Symbol/Name" name="string" min="0" @bind="_symbolName">
+            <div class="modal-body"> <input type="text" id="NameSymbol" placeholder="Symbol/Name" name="string" min="0" @bind="_symbolName">
                 <input type="number" id="AmountInput" placeholder="Amount" name="numericInput" min="0" @bind="_amount">
                 <button type="button" class="btn btn-primary" @onclick="() => Buy(_amount)">Buy</button>
             </div>
             <div class="modal-footer" id="BuySellModalFooter">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" @onclick="() => Buy(1)">Buy x1</button>
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="alert alert-danger">
+                        @_errorMessage
+                    </div>
+                }
             </div>
         </div>
     </div>
 </div>
 
-@if (!string.IsNullOrEmpty(_errorMessage))
-{
-    <div class="alert alert-danger">
-        @_errorMessage
-    </div>
-}
+
 
 @code {
 
     [Parameter] public ApplicationUser _owner { get; set; }
 
-    private BaseDataType _type;
+    [Parameter] public BaseDataType _type { get; set; }
 
     private string _symbolName;
 
@@ -53,11 +51,11 @@
     private string? _errorMessage;
 
     
-    private void Buy(decimal amount)
+    private async Task Buy(decimal amount)
     {
         try
         {
-            Transaction.Buy(_owner, _type, amount, _symbolName);
+            await Transaction.Buy(_owner, _type, amount, _symbolName);
         }
         catch (Exception ex)
         {
