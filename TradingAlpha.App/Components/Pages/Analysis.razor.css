@@ -1,14 +1,26 @@
 ﻿
+
 .container {
-    border: 3px rgba(15, 194, 192,0.3);
+    background: #ffffff;
     border-radius: 15px;
-    border-style: solid;
-    padding: 10px;;
+    padding: 10px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    width: 100%;
 }
+
+.input-group{
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
 #Services{
     width: 75px;
-    
+    color: black;
 }
+
+.btn-outline-secondary{
+    color: black;
+}
+
 
 #FrameStartDate{
     margin-bottom: 10px;
@@ -16,6 +28,11 @@
 
 #Indicators{
     margin-top: 10px;
+    padding: 10px ;
+}
+
+#indicators {
+    width: auto;
 }
 
 .form-check-input:checked {
@@ -23,12 +40,12 @@
 }
 
 #Chart {
-    height: 500px;
+    height: 600px;
 }
 
 
 h5{
-    margin-bottom: -2px;
+    margin-bottom: 5px;
 }
 
 
@@ -44,6 +61,6 @@ h5{
 .accent3 {background: #008F8C}
 .accent4 {background: #0CABA0}
 .accent5 {background: #0FC2C0}
-.stock{background: #d63384 }
-.crypto{background: #9932cc
+.stock{background: #8c00ff; }
+.crypto{background: #00feff}
 }

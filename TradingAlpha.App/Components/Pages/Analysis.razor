@@ -11,15 +11,19 @@
 @inject ICryptoDataService CData
 
 
-
 <PageTitle>Analysis</PageTitle>
+
+<style> body{
+    @BackgroundColor
+}
+</style>
 
 @* Search Bar *@
 <div class="row justify-content-center">
     <div class="col">
         <div class="input-group mb-3" id="symbol_input_group">
             <div class="input-group-prepend">
-             <button class="btn btn-outline-dark" type="button" @onclick="SwitchService" id="Services" style="@ButtonColor">@CurService </button>   
+             <button class="btn btn-outline-secondary" type="button" @onclick="SwitchService" id="Services" style="@ButtonColor">@CurService </button>   
             </div>
             <input @bind="SymbolInput" type="text" class="form-control" placeholder="Input crypto or stock symbol" aria-label="Symbol" aria-describedby="basic-addon2" id="SymbolSearch">
             <div class="input-group-append">
@@ -92,54 +96,43 @@
         
         <div class="container" id="FrameStartDate">
             <h5>Bar width</h5>
-            <div class="btn-group btn-group-sm" role="group" aria-label="TimeFrame">
-                <button type="button" class="btn btn-info" @onclick="@(() => SetTimeFrame("1min"))">1min</button>
-                <button type="button" class="btn btn-info" @onclick="@(() => SetTimeFrame("15min"))">15min</button>
-                <button type="button" class="btn btn-info" @onclick="@(() => SetTimeFrame("1H"))">Hour</button>
-                <button type="button" class="btn btn-info" @onclick="@(() => SetTimeFrame("1D"))">Day</button>
-                <button type="button" class="btn btn-info" @onclick="@(() => SetTimeFrame("1M"))">Month</button>
+            <div class="btn-group special" role="group" aria-label="TimeFrame">
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1min"))">1min</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("15min"))">15min</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1H"))">Hour</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1D"))">Day</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1M"))">Month</button>
             </div>
             <h5>Timeframe</h5>
-            <div class="btn-group btn-group-sm" role="group" aria-label="StartDate">
-                <button type="button" class="btn btn-info" @onclick="@(() => SetStartDate("1D"))">1D</button>
-                <button type="button" class="btn btn-info" @onclick="@(() => SetStartDate("1M"))">1M</button>
-                <button type="button" class="btn btn-info" @onclick="@(() => SetStartDate("6M"))">6M</button>
-                <button type="button" class="btn btn-info" @onclick="@(() => SetStartDate("1Y"))">1Y</button>
-                <button type="button" class="btn btn-info" @onclick="@(() => SetStartDate("5Y"))">5Y</button>
+            <div class="btn-group special" role="group" aria-label="StartDate">
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("1D"))">1D</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("1M"))">1M</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("6M"))">6M</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("1Y"))">1Y</button>
+                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("5Y"))">5Y</button>
             </div>
         </div>
         
         <div class="container" id="Indicators">
 
-            <h5>Indicators</h5>
+            <h5>Toggle Indicators</h5>
+            
+            <button type="button" class="btn btn-secondary" @onclick="ToggleVolume" data-bs-toggle="tooltip" data-bs-placement="right" title="Trading Volume" id="indicators">
+                Volume
+            </button>
 
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" @onchange="ToggleVolume" role="switch" id="Volume">
-                <label class="form-check-label" title="Trading Volume" for="Volume">
-                    Volume
-                </label>
-            </div>
+            <button type="button" class="btn btn-secondary" @onclick="ToggleVWAP" data-bs-toggle="tooltip" data-bs-placement="right" title="Volume Weighted Average Price" id="indicators">
+                VWAP
+            </button>
 
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" @onchange="ToggleVWAP" role="switch" id="VWAP">
-                <label class="form-check-label" title="Volume Weighted Average Price" for="VWAP">
-                    VWAP
-                </label>
-            </div>
+            <button type="button" class="btn btn-secondary" @onclick="ToggleSMA" data-bs-toggle="tooltip" data-bs-placement="right" title="Simple Moving Average" id="indicators">
+                SMA
+            </button>
 
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" @onchange="ToggleSMA" role="switch" id="SMA">
-                <label class="form-check-label" title="Simple Moving Average" for="SMA">
-                    SMA
-                </label>
-            </div>
-
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="RSI">
-                <label class="form-check-label" title="Relative Strength Index" for="RSI">
-                    RSI
-                </label>
-            </div>
+            <button type="button" class="btn btn-secondary" @onclick="ToggleSMA" data-bs-toggle="tooltip" data-bs-placement="right" title="Relative Strength Index" id="indicators">
+                RSI
+            </button>
+            
         </div>
     </div>
 </div>
@@ -147,7 +140,8 @@
 
 @code {
     public string CurService { get; set; } = "Stock";
-    public string ButtonColor { get; set; } = "background-color: darkorchid;";
+    public string ButtonColor { get; set; } = "background-color: #8c00ff;";
+    public string BackgroundColor { get; set; } = "background: rgb(140,0,255); background: linear-gradient(152deg, rgba(140,0,255,0.6) 1%, rgba(255,255,255,1) 80%);";
     
     public void SwitchService()
     {
@@ -155,15 +149,18 @@
         {   
             case "Stock": 
                 CurService = "Crypto";
-                ButtonColor = "background-color: #d63384;";
+                ButtonColor = "background-color: #00feff;";
+                BackgroundColor = "background: rgb(0,254,255); background: linear-gradient(152deg, rgba(0,254,255,0.4) 1%, rgba(255,255,255,1) 80%);";
                 break;
-            case "Cryto": 
+            case "Crypto": 
                 CurService = "Stock";
-                ButtonColor = "background-color: darkorchid;";
+                ButtonColor = "background-color: #8c00ff;";
+                BackgroundColor = "background: rgb(140,0,255); background: linear-gradient(152deg, rgba(140,0,255,0.6) 1%, rgba(255,255,255,1) 80%);";
                 break;
             default: 
                 CurService = "Stock";
-                ButtonColor = "background-color: darkorchid;";
+                ButtonColor = "background-color: #8c00ff;";
+                BackgroundColor = "background: rgb(140,0,255); background: linear-gradient(152deg, rgba(140,0,255,0.6) 1%, rgba(255,255,255,1) 80%);";
                 break;
          }
 
