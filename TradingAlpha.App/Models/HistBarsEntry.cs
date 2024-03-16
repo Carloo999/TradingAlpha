@@ -28,4 +28,6 @@ public class HistBarsEntry
    
    [JsonProperty(PropertyName = "vw")]
    public decimal VolumeWeighted { get; set; }
+   
+   public decimal SMA { get; set; }
 }
