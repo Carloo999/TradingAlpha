@@ -16,7 +16,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Buy/Sell @_symbol</h5>
+                <h5 class="modal-title">Buy/Sell @_nameSymbol</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times</span>
                 </button>
@@ -45,7 +45,7 @@
 @code {
     [Parameter] public BaseDataType _type { get; set; }
 
-    [Parameter] public string _symbol { get; set; }
+    [Parameter] public string _nameSymbol { get; set; }
 
     [Parameter] public ApplicationUser _owner { get; set; }
 
@@ -59,7 +59,7 @@
     {
         try
         {
-            await Transaction.Sell(_owner, _type, amount, _symbol);
+            await Transaction.Sell(_owner, _type, amount, _nameSymbol);
         }
         catch (Exception ex)
         {
@@ -71,7 +71,7 @@
     {
         try
         {
-            await Transaction.Buy(_owner, _type, amount, _symbol);
+            await Transaction.Buy(_owner, _type, amount, _nameSymbol);
         }
         catch (Exception ex)
         {
