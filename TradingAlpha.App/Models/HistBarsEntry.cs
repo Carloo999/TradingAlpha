@@ -30,6 +30,4 @@ public class HistBarsEntry
    public decimal VolumeWeighted { get; set; }
    
    public decimal SMA { get; set; }
-   
-   public double RSI { get; set; }
 }
