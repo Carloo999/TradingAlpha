@@ -67,7 +67,7 @@
                     <td>@(stockEntry.Amount * stockEntry.CurrentPrice)</td>
                     @if (_editable)
                     {
-                        <td> <EditModal _owner="@_owner" _amountOwned="@stockEntry.Amount" _type="BaseDataType.Stock" _NameSymbol="@stockEntry.Symbol"/> </td>
+                        <td> <EditModal _owner="@_owner" _amountOwned="@stockEntry.Amount" _type="BaseDataType.Stock" _symbol="@stockEntry.Symbol"/> </td>
                     }
                 </tr>
             }
@@ -83,7 +83,7 @@
                     <td>@(cryptoEntry.Amount * cryptoEntry.CurrentPrice)</td>
                     @if (_editable)
                     {
-                        <td> <EditModal _owner="@_owner" _amountOwned="@cryptoEntry.Amount" _type="BaseDataType.Crypto" _NameSymbol="@cryptoEntry.Name"/> </td>
+                        <td> <EditModal _owner="@_owner" _amountOwned="@cryptoEntry.Amount" _type="BaseDataType.Crypto" _symbol="@cryptoEntry.Name"/> </td>
                     }
                 </tr>
             }

@@ -4,15 +4,19 @@
 
 @inject ITransactionManager Transaction
 
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#BuySellModal">
+@{
+    string modalId = "BuySellModal_" + Guid.NewGuid().ToString();
+}
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#@modalId">
     Edit
 </button>
 
-<div id="BuySellModal" class="modal fade" tabindex="-1" role="dialog">
+<div id="@modalId" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Buy/Sell @_nameSymbol</h5>
+                <h5 class="modal-title">Buy/Sell @_symbol</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times</span>
                 </button>
@@ -22,7 +26,7 @@
                 <input type="number" id="BuySellAmountInput" name="numericInput" min="0" max="@_amountOwned" @bind="_buySellAmount">
                 <button type="button" class="btn btn-primary" @onclick="() => Buy(_buySellAmount)">Buy</button>
             </div>
-            <div class="modal-footer" id="BuySellModalFooter">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" @onclick="() => Buy(1)">Buy x1</button>
                 <button type="button" class="btn btn-primary" @onclick="() => Sell(_amountOwned)">Sell All</button>
@@ -41,7 +45,7 @@
 @code {
     [Parameter] public BaseDataType _type { get; set; }
 
-    [Parameter] public string _nameSymbol { get; set; } = string.Empty;
+    [Parameter] public string _symbol { get; set; }
 
     [Parameter] public ApplicationUser _owner { get; set; }
 
@@ -55,7 +59,7 @@
     {
         try
         {
-            await Transaction.Sell(_owner, _type, amount, _nameSymbol);
+            await Transaction.Sell(_owner, _type, amount, _symbol);
         }
         catch (Exception ex)
         {
@@ -67,7 +71,7 @@
     {
         try
         {
-            await Transaction.Buy(_owner, _type, amount, _nameSymbol);
+            await Transaction.Buy(_owner, _type, amount, _symbol);
         }
         catch (Exception ex)
         {
