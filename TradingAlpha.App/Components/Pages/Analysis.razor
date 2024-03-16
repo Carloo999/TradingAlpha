@@ -97,19 +97,19 @@
         <div class="container" id="FrameStartDate">
             <h5>Bar width</h5>
             <div class="btn-group special" role="group" aria-label="TimeFrame">
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1min"))">1min</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("15min"))">15min</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1H"))">Hour</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1D"))">Day</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetTimeFrame("1M"))">Month</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="@(() => SetTimeFrame("1min"))" style="@curBWColors.BW1min">1min</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="@(() => SetTimeFrame("15min"))" style="@curBWColors.BW15min">15min</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="@(() => SetTimeFrame("1H"))" style="@curBWColors.BW1H">Hour</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="@(() => SetTimeFrame("1D"))" style="@curBWColors.BW1D">Day</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="@(() => SetTimeFrame("1M"))"  style="@curBWColors.BW1M">Month</button>
             </div>
             <h5>Timeframe</h5>
             <div class="btn-group special" role="group" aria-label="StartDate">
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("1D"))">1D</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("1M"))">1M</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("6M"))">6M</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("1Y"))">1Y</button>
-                <button type="button" class="btn btn-secondary" @onclick="@(() => SetStartDate("5Y"))">5Y</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="@(() => SetStartDate("1D"))" style="@curTFColors.TF1D">1D</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="@(() => SetStartDate("1M"))" style="@curTFColors.TF1M">1M</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="@(() => SetStartDate("6M"))" style="@curTFColors.TF6M">6M</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="@(() => SetStartDate("1Y"))" style="@curTFColors.TF1Y">1Y</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="@(() => SetStartDate("5Y"))" style="@curTFColors.TF5Y">5Y</button>
             </div>
         </div>
         
@@ -117,28 +117,30 @@
 
             <h5>Toggle Indicators</h5>
             
-            <button type="button" class="btn btn-secondary" @onclick="ToggleVolume" data-bs-toggle="tooltip" data-bs-placement="right" title="Trading Volume" id="indicators">
+            <button type="button" class="btn btn-outline-dark" @onclick="ToggleVolume" data-bs-toggle="tooltip" data-bs-placement="right" title="Trading Volume" id="indicators">
                 Volume
             </button>
 
-            <button type="button" class="btn btn-secondary" @onclick="ToggleVWAP" data-bs-toggle="tooltip" data-bs-placement="right" title="Volume Weighted Average Price" id="indicators">
+            <button type="button" class="btn btn-outline-dark" @onclick="ToggleVWAP" data-bs-toggle="tooltip" data-bs-placement="right" title="Volume Weighted Average Price" id="indicators">
                 VWAP
             </button>
 
-            <button type="button" class="btn btn-secondary" @onclick="ToggleSMA" data-bs-toggle="tooltip" data-bs-placement="right" title="Simple Moving Average" id="indicators">
+            <button type="button" class="btn btn-outline-dark" @onclick="ToggleSMA" data-bs-toggle="tooltip" data-bs-placement="right" title="Simple Moving Average" id="indicators">
                 SMA
-            </button>
-
-            <button type="button" class="btn btn-secondary" @onclick="ToggleSMA" data-bs-toggle="tooltip" data-bs-placement="right" title="Relative Strength Index" id="indicators">
-                RSI
             </button>
             
         </div>
     </div>
 </div>
-<p>@ErrMessage</p>
+
+<div class="alert alert-danger" role="alert" hidden="@ErrorHidden">
+  @ErrMessage
+</div>
 
 @code {
+    public bool ErrorHidden { get; set; } = true;
+    public BWButtonColors curBWColors { get; set; } = BWButtonColors.startColors();
+    public TFButtonColors curTFColors { get; set; } = TFButtonColors.startColors();
     public string CurService { get; set; } = "Stock";
     public string ButtonColor { get; set; } = "background-color: #8c00ff;";
     public string BackgroundColor { get; set; } = "background: rgb(140,0,255); background: linear-gradient(152deg, rgba(140,0,255,0.6) 1%, rgba(255,255,255,1) 80%);";
@@ -238,11 +240,13 @@
             await ToggleSMA();
             await ToggleVolume();
             await ToggleVWAP();
+            ErrorHidden = true;
         }
         
         catch (Exception e)
         {
             ErrMessage = "Input valid symbol. Crypto symbol has to be [COIN SYMBOL]/[EXCHANGE CURRENCY]";
+            ErrorHidden = false;
         }
 
     }
@@ -332,7 +336,26 @@
 
     public void SetTimeFrame(string frame)
     {
+        curBWColors = new BWButtonColors();
         TimeFrame = frame;
+        switch (frame)
+        {
+            case "1min":
+                curBWColors.BW1min = "background-color: #d4d4d4;";
+                break;
+            case "15min":
+                curBWColors.BW15min = "background-color: #d4d4d4;";
+                break;
+            case "1H":
+                curBWColors.BW1H = "background-color: #d4d4d4;";
+                break;
+            case "1D":
+                curBWColors.BW1D = "background-color: #d4d4d4;";
+                break;
+            case "1M":
+                curBWColors.BW1D = "background-color: #d4d4d4;";
+                break;
+        }
     }
 
     
@@ -341,22 +364,28 @@
 
     public void SetStartDate(string timestring)
     {
+        curTFColors = new TFButtonColors();
         switch (timestring)
         {
             case "1D":
                 StartDate = DateTime.Today.AddDays(-1);
+                curTFColors.TF1D = "background-color: #d4d4d4;";
                 break;
             case "1M":
                 StartDate = DateTime.Today.AddMonths(-1);
+                curTFColors.TF1M = "background-color: #d4d4d4;";
                 break;
             case "6M":
                 StartDate = DateTime.Today.AddMonths(-6);
+                curTFColors.TF6M = "background-color: #d4d4d4;";
                 break;
             case "1Y":
                 StartDate = DateTime.Today.AddYears(-1);
+                curTFColors.TF1Y = "background-color: #d4d4d4;";
                 break;
             case "5Y":
                 StartDate = DateTime.Today.AddYears(-5);
+                curTFColors.TF5Y = "background-color: #d4d4d4;";
                 break;
         }
        
@@ -402,4 +431,37 @@ Moving Average
 Relative Strength Index (RSI)
 
 *@
+    
+    public class BWButtonColors
+    {
+        public string BW1min { get; set; } = "background-color: #ffffff";
+        public string BW15min { get; set; } = "background-color: #ffffff";
+        public string BW1H { get; set; } = "background-color: #ffffff";
+        public string BW1D { get; set; } = "background-color: #ffffff";
+        public string BW1M { get; set; } = "background-color: #ffffff";
+
+        public static BWButtonColors startColors()
+        {
+            BWButtonColors colors = new BWButtonColors();
+            colors.BW1H = "background-color: #d4d4d4;";
+            return colors;
+        }
+    }
+    
+    public class TFButtonColors
+    {
+        public string TF1D { get; set; } = "background-color: #ffffff";
+        public string TF1M { get; set; } = "background-color: #ffffff";
+        public string TF6M { get; set; } = "background-color: #ffffff";
+        public string TF1Y { get; set; } = "background-color: #ffffff";
+        public string TF5Y { get; set; } = "background-color: #ffffff";
+        
+        public static TFButtonColors startColors()
+        {
+            TFButtonColors colors = new TFButtonColors();
+            colors.TF1M = "background-color: #d4d4d4;";
+            return colors;
+        }
+    }
+    
 }
