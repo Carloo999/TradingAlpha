@@ -28,6 +28,7 @@ public class ApplicationUserManager(
 
     public async Task<IdentityResult> CreateDefaultUser(ApplicationUser user, string password)
     {
+        user.Balance = 10_000;
         IdentityResult r1= await AddUserToDb(user, password);
         IdentityResult r2= await userManager.AddToRoleAsync(user, Roles.User.ToString());
 
