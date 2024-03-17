@@ -40,7 +40,7 @@ public class PortfolioManager(
                     Symbol = stockTransaction.Symbol
                 };
                 
-                stockEntry.PortfolioId = GetUserPortfolio(user).Id;
+                //stockEntry.PortfolioId = GetUserPortfolio(user).Id;
                 //Add new portfolio entry
                 await db.PortfolioEntries.AddAsync(stockEntry);
             }
