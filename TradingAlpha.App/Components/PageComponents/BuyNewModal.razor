@@ -1,0 +1,66 @@
+@using TradingAlpha.App.Enums
+@using TradingAlpha.App.Data
+@using TradingAlpha.App.Services.Interfaces
+@using Microsoft.EntityFrameworkCore
+
+@inject ITransactionManager Transaction
+
+<button type="button" class="btn btn-outline-dark" data-toggle="modal" data-target="#BuyNewModal">
+    Buy New
+</button>
+
+<div id="BuyNewModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times</span>
+                </button>
+            </div>
+            <div class="modal-body"> <input type="text" id="NameSymbol" placeholder="Symbol/Name" name="string" min="0" @bind="_symbolName">
+                <input type="number" id="AmountInput" placeholder="Amount" name="numericInput" min="0" @bind="_amount">
+                <button type="button" class="btn btn-primary" @onclick="() => Buy(_amount)">Buy</button>
+            </div>
+            <div class="modal-footer" id="BuySellModalFooter">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="() => Buy(1)">Buy x1</button>
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="alert alert-danger">
+                        @_errorMessage
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+
+    [Parameter] public ApplicationUser _owner { get; set; }
+
+    [Parameter] public BaseDataType _type { get; set; }
+
+    private string _symbolName;
+
+    private decimal _amount;
+
+    private string? _errorMessage;
+
+    
+    private async Task Buy(decimal amount)
+    {
+        try
+        {
+            await Transaction.Buy(_owner, _type, amount, _symbolName);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "An error occurred: " + ex.Message;
+        }
+    }
+
+}

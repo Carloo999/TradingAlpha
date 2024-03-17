@@ -1,0 +1,41 @@
+﻿#HeadingContainer{
+    width: fit-content;
+    height: fit-content;
+    justify-content: center;
+    color: #0CABA0;
+    font-size: large;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 5px;
+}
+
+#BuySellModalFooter {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.container {
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    background: white;
+}
+
+.btn{
+    outline-color: black;
+    color: black;
+}
+
+.special {
+    display: flex;
+    justify-content: flex-end;
+}
+
+
+.background {background: #121212}
+.accent1 {background: #023535}
+.accent2 {background: #015958}
+.accent3 {background: #008F8C}
+.accent4 {background: #0CABA0}
+.accent5 {background: #0FC2C0}

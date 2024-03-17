@@ -1,8 +1,269 @@
-﻿@page "/UserPortfolio" /* Wenn User eigenes Portfolio öffnen will*/
-@page "/UserPortfolio/{Username}" /* Wenn User fremdes oder eigenes Portfolio öffnen will*/
+@page "/Portfolio"
+@page "/Portfolio/{Username}"
+@using TradingAlpha.App.Services.Interfaces
+@using TradingAlpha.App.Models.EntryTypes
+@using TradingAlpha.App.Data
+@using TradingAlpha.App.Enums
+@using TradingAlpha.App.Components.PageComponents
+@using TradingAlpha.App.Models.TransactionTypes
+@using System.Globalization
+@rendermode InteractiveServer
 
-<h3>UserPortfolio</h3>
+@inject IPortfolioManager PortfolioManager
+@inject ITransactionManager TransactionManager
+@inject IApplicationUserManager UserManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+
+<PageTitle>Portfolio</PageTitle>
+
+<style>
+    body 
+    { 
+    @BackgroundColor 
+    }
+    
+</style>
+
+@if (_authorized && _owner != null)
+{
+    <div class="container mb-5" style="background: white">
+        <div class="btn-group special">
+            <button class="btn btn-outline-secondary" id="ToggleModeButton" style="@ButtonColor" @onclick="ToggleMode"> @(_type == BaseDataType.Stock ? "Stock" : "Crypto")</button>
+            @if (_editable)
+            {
+                <BuyNewModal _owner="@_owner" _type="_type"/>
+            }
+            <button class="btn btn-outline-dark" id="UpdateButton" @onclick="UpdatePort">Update</button>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <h3>Portfolio</h3>
+
+        <table class="table">
+            <thead>
+            <tr>
+                @if (_inStockMode)
+                {
+                    <th>Ticker</th>
+                }
+                else
+                {
+                    <th>Name</th>
+                }
+                <th>Price</th>
+                <th>Amount</th>
+                <th>Value</th>
+                @if (_editable)
+                {
+                    <th>Buy/Sell</th>
+                }
+            </tr>
+            </thead>
+
+            <tbody>
+            @if (_inStockMode)
+            {
+                foreach (var stockEntry in _stockEntries)
+                {
+                    <tr>
+                        <td>@stockEntry.Symbol</td>
+                        <td>@stockEntry.CurrentPrice</td>
+                        <td>@stockEntry.Amount</td>
+                        <td>@(stockEntry.Amount * stockEntry.CurrentPrice)</td>
+                        @if (_editable)
+                        {
+                            <td>
+                                <EditModal _owner="@_owner" _amountOwned="@stockEntry.Amount" _type="BaseDataType.Stock" _nameSymbol="@stockEntry.Symbol"/>
+                            </td>
+                        }
+                    </tr>
+                }
+            }
+            else
+            {
+                foreach (var cryptoEntry in _cryptoEntries)
+                {
+                    <tr>
+                        <td>@cryptoEntry.Name</td>
+                        <td>@cryptoEntry.CurrentPrice</td>
+                        <td>@cryptoEntry.Amount</td>
+                        <td>@(cryptoEntry.Amount * cryptoEntry.CurrentPrice)</td>
+                        @if (_editable)
+                        {
+                            <td>
+                                <EditModal _owner="@_owner" _amountOwned="@cryptoEntry.Amount" _type="BaseDataType.Crypto" _nameSymbol="@cryptoEntry.Name"/>
+                            </td>
+                        }
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container">
+
+        <h3>Transactions</h3>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Time</th>
+                <th>Type</th>
+                @if (_inStockMode)
+                {
+                    <th>Ticker</th>
+                }
+                else
+                {
+                    <th>Name</th>
+                }
+                <th>At Price</th>
+                <th>Amount</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            @if (_inStockMode)
+            {
+                for (var i = _stockTransactions.Length - 1; i >= 0; i--)
+                {
+                    <tr>
+                        <td>@_stockTransactions[i].Timestamp.ToString("dd.MM.yyyy HH:mm:ss", CultureInfo.GetCultureInfo("de-DE"))</td>
+                        <td>@_stockTransactions[i].TransactionBaseType.ToString().Substring(0, _stockTransactions[i].TransactionBaseType.ToString().Length - 6)</td>
+                        <td>@_stockTransactions[i].Symbol</td>
+                        <td>@_stockTransactions[i].AtPrice</td>
+                        <td>@_stockTransactions[i].Amount</td>
+                        <td>@(_stockTransactions[i].Amount * _stockTransactions[i].AtPrice)</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                for (var i = _cryptoTransactions.Length - 1; i >= 0; i--)
+                {
+                    <tr>
+                        <td>@_cryptoTransactions[i].Timestamp.ToString("dd.MM.yyyy HH:mm:ss", CultureInfo.GetCultureInfo("de-DE"))</td>
+                        <td>@_cryptoTransactions[i].TransactionBaseType</td>
+                        <td>@_cryptoTransactions[i].Name</td>
+                        <td>@_cryptoTransactions[i].AtPrice</td>
+                        <td>@_cryptoTransactions[i].Amount</td>
+                        <td>@(_cryptoTransactions[i].Amount * _cryptoTransactions[i].AtPrice)</td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <h3>Überprüfe ob du eingeloggt bist und dieses Portfolio sehen darfst.</h3>
+}
 
 @code {
-    
+    private string BackgroundColor { get; set; } = "background: rgb(140,0,255); background: linear-gradient(152deg, rgba(140,0,255,0.6) 1%, rgba(255,255,255,1) 80%);";
+    public string ButtonColor { get; set; } = "background-color: #8c00ff;";
+    private bool _inStockMode = true;
+    private BaseDataType _type = BaseDataType.Stock;
+    private ApplicationUser? _user;
+    private ApplicationUser? _owner;
+    private bool _authorized;
+    private bool _editable;
+    private StockEntry[] _stockEntries;
+    private CryptoEntry[] _cryptoEntries;
+    private StockTransaction[] _stockTransactions;
+    private CryptoTransaction[] _cryptoTransactions;
+
+    [Parameter] public string Username { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUsers();
+        if (_owner != null)
+        {
+            (_authorized, _editable) = await UserManager.GetIsAuthorized(_owner, _user);
+
+            _stockEntries = await PortfolioManager.GetStockEntries(_owner);
+            _cryptoEntries = await PortfolioManager.GetCryptoEntries(_owner);
+            _stockTransactions = TransactionManager.GetStockTransactions(_owner);
+            _cryptoTransactions = TransactionManager.GetCryptoTransactions(_owner);
+        }
+    }
+
+    private async Task ToggleMode()
+    {
+        _inStockMode = !_inStockMode;
+        _type = _type == BaseDataType.Stock ? BaseDataType.Crypto : BaseDataType.Stock;
+
+        if (_inStockMode)
+        {
+            _stockEntries = await PortfolioManager.GetStockEntries(_owner);
+            _stockTransactions = TransactionManager.GetStockTransactions(_owner);
+            ButtonColor = "background-color: #8c00ff;";
+            BackgroundColor = "background: rgb(140,0,255); background: linear-gradient(152deg, rgba(140,0,255,0.6) 1%, rgba(255,255,255,1) 80%);";
+        }
+        else
+        {
+            _cryptoEntries = await PortfolioManager.GetCryptoEntries(_owner);
+            _cryptoTransactions = TransactionManager.GetCryptoTransactions(_owner);
+            ButtonColor = "background-color: #00feff;";
+            BackgroundColor = "background: rgb(0,254,255); background: linear-gradient(152deg, rgba(0,254,255,0.4) 1%, rgba(255,255,255,1) 80%);";
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task<ApplicationUser?> GetCurrentUser()
+    {
+        AuthenticationState auth = await AuthStateProvider.GetAuthenticationStateAsync();
+        return await UserManager.GetUserByAuthState(auth);
+    }
+
+    private async Task GetUsers()
+    {
+        if (string.IsNullOrEmpty(Username))
+        {
+            _user = await GetCurrentUser();
+            if (_user != null)
+            {
+                Username = _user.Id;
+                _owner = _user;
+            }
+            else
+            {
+                // Message
+            }
+        }
+        else
+        {
+            _owner = await UserManager.GetUserById(Username);
+            _user = await GetCurrentUser();
+            if (_owner == null)
+            {
+                // Message
+            }
+        }
+    }
+
+    private async Task UpdatePort()
+    {
+        await PortfolioManager.UpdateAllPricesInPort(_owner);
+        if (_inStockMode)
+        {
+            _stockEntries = await PortfolioManager.GetStockEntries(_owner);
+            _stockTransactions = TransactionManager.GetStockTransactions(_owner);
+        }
+        else
+        {
+            _cryptoEntries = await PortfolioManager.GetCryptoEntries(_owner);
+            _cryptoTransactions = TransactionManager.GetCryptoTransactions(_owner);
+        }
+
+        StateHasChanged();
+    }
+
 }

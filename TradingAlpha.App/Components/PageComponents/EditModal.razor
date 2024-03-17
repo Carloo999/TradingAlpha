@@ -1,0 +1,82 @@
+@using TradingAlpha.App.Enums
+@using TradingAlpha.App.Data
+@using TradingAlpha.App.Services.Interfaces
+
+@inject ITransactionManager Transaction
+
+@{
+    string modalId = "BuySellModal_" + Guid.NewGuid().ToString();
+}
+
+<button type="button" class="btn btn-outline-dark" data-toggle="modal" data-target="#@modalId">
+    Edit
+</button>
+
+<div id="@modalId" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Buy/Sell @_nameSymbol</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="btn btn-primary" @onclick="() => Sell(_buySellAmount)">Sell</button>
+                <input type="number" id="BuySellAmountInput" name="numericInput" min="0" max="@_amountOwned" @bind="_buySellAmount">
+                <button type="button" class="btn btn-primary" @onclick="() => Buy(_buySellAmount)">Buy</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="() => Buy(1)">Buy x1</button>
+                <button type="button" class="btn btn-primary" @onclick="() => Sell(_amountOwned)">Sell All</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger">
+        @_errorMessage
+    </div>
+}
+
+@code {
+    [Parameter] public BaseDataType _type { get; set; }
+
+    [Parameter] public string _nameSymbol { get; set; }
+
+    [Parameter] public ApplicationUser _owner { get; set; }
+
+    [Parameter] public decimal _amountOwned { get; set; }
+
+    private decimal _buySellAmount;
+
+    private string? _errorMessage;
+
+    private async Task Sell(decimal amount)
+    {
+        try
+        {
+            await Transaction.Sell(_owner, _type, amount, _nameSymbol);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "An error occurred: " + ex.Message;
+        }
+    }
+    
+    private async Task Buy(decimal amount)
+    {
+        try
+        {
+            await Transaction.Buy(_owner, _type, amount, _nameSymbol);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "An error occurred: " + ex.Message;
+        }
+    }
+
+}
