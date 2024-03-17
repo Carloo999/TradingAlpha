@@ -5,8 +5,12 @@
 - TradingAlpha.zip entpacken und start.bat ausführen.
 
 ## Login
-e-mail: Owner@mail.com <br>s
+Entwerder mit Owner-Credential einloggen:
+
+e-mail: Owner@mail.com <br>
 password:  TradingAlpha123!
+
+Oder eigenen Account erstellen.
 
 ## Analysis-Page
 Auf der Analysis-Page lassen sich historische Aktien- und Krypto-Kurse ansehen und analysieren.
