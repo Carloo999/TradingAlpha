@@ -20,11 +20,11 @@
             </div>
             <div class="modal-body"> <input type="text" id="NameSymbol" placeholder="Symbol/Name" name="string" min="0" @bind="_symbolName">
                 <input type="number" id="AmountInput" placeholder="Amount" name="numericInput" min="0" @bind="_amount">
-                <button type="button" class="btn btn-primary" @onclick="() => Buy(_amount)">Buy</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="() => Buy(_amount)">Buy</button>
             </div>
             <div class="modal-footer" id="BuySellModalFooter">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" @onclick="() => Buy(1)">Buy x1</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="() => Buy(1)">Buy x1</button>
                 @if (!string.IsNullOrEmpty(_errorMessage))
                 {
                     <div class="alert alert-danger">

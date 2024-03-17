@@ -22,14 +22,14 @@
                 </button>
             </div>
             <div class="modal-body">
-                <button type="button" class="btn btn-primary" @onclick="() => Sell(_buySellAmount)">Sell</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="() => Sell(_buySellAmount)">Sell</button>
                 <input type="number" id="BuySellAmountInput" name="numericInput" min="0" max="@_amountOwned" @bind="_buySellAmount">
-                <button type="button" class="btn btn-primary" @onclick="() => Buy(_buySellAmount)">Buy</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="() => Buy(_buySellAmount)">Buy</button>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" @onclick="() => Buy(1)">Buy x1</button>
-                <button type="button" class="btn btn-primary" @onclick="() => Sell(_amountOwned)">Sell All</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="() => Buy(1)">Buy x1</button>
+                <button type="button" class="btn btn-outline-dark" @onclick="() => Sell(_amountOwned)">Sell All</button>
             </div>
         </div>
     </div>
