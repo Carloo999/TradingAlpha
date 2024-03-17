@@ -1,5 +1,7 @@
 ﻿.btn{
     outline-color: black;
+    color: black;
+    background: white;
 }
 
 .alert{
