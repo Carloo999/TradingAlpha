@@ -1,10 +1,11 @@
 ![Trading ALpha](https://raw.githubusercontent.com/Carloo999/TradingAlpha/3a42c725c4130dca2742ddec2cd38b4f60e40424/TradingAlpha.App/wwwroot/Assets/logo_white_mode.svg)
 
 ## Installation
-
+- .Net Sdk installieren https://dotnet.microsoft.com/en-us/download <br>
+- TradingAlpha.zip entpacken und start.bat ausführen.
 
 ## Login
-e-mail: Owner@mail.com <br>
+e-mail: Owner@mail.com <br>s
 password:  TradingAlpha123!
 
 ## Analysis-Page
