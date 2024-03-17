@@ -17,18 +17,28 @@
 
 <PageTitle>Portfolio</PageTitle>
 
+<style>
+    body 
+    { 
+    @BackgroundColor 
+    }
+    
+</style>
+
 @if (_authorized && _owner != null)
 {
-    <div class="container-fluid">
-        <button class="btn btn-primary mr-1" id="ToggleModeButton" @onclick="ToggleMode"> @(_type == BaseDataType.Stock ? "Stock" : "Crypto") </button>
-        @if (_editable)
-        {
-            <BuyNewModal _owner="@_owner" _type="_type"/>
-        }
-        <button class="btn btn-primary" id="UpdateButton" @onclick="UpdatePort">Update</button>
+    <div class="container mb-5" style="background: white">
+        <div class="btn-group special">
+            <button class="btn btn-outline-secondary" id="ToggleModeButton" style="@ButtonColor" @onclick="ToggleMode"> @(_type == BaseDataType.Stock ? "Stock" : "Crypto")</button>
+            @if (_editable)
+            {
+                <BuyNewModal _owner="@_owner" _type="_type"/>
+            }
+            <button class="btn btn-outline-dark" id="UpdateButton" @onclick="UpdatePort">Update</button>
+        </div>
     </div>
 
-    <div class="container-fluid">
+    <div class="container mb-5">
         <h3>Portfolio</h3>
 
         <table class="table">
@@ -93,7 +103,7 @@
         </table>
     </div>
 
-    <div class="container-fluid">
+    <div class="container">
 
         <h3>Transactions</h3>
 
@@ -155,6 +165,8 @@ else
 }
 
 @code {
+    private string BackgroundColor { get; set; } = "background: rgb(140,0,255); background: linear-gradient(152deg, rgba(140,0,255,0.6) 1%, rgba(255,255,255,1) 80%);";
+    public string ButtonColor { get; set; } = "background-color: #8c00ff;";
     private bool _inStockMode = true;
     private BaseDataType _type = BaseDataType.Stock;
     private ApplicationUser? _user;
@@ -174,12 +186,35 @@ else
         if (_owner != null)
         {
             (_authorized, _editable) = await UserManager.GetIsAuthorized(_owner, _user);
-            
+
             _stockEntries = await PortfolioManager.GetStockEntries(_owner);
             _cryptoEntries = await PortfolioManager.GetCryptoEntries(_owner);
             _stockTransactions = TransactionManager.GetStockTransactions(_owner);
             _cryptoTransactions = TransactionManager.GetCryptoTransactions(_owner);
         }
+    }
+
+    private async Task ToggleMode()
+    {
+        _inStockMode = !_inStockMode;
+        _type = _type == BaseDataType.Stock ? BaseDataType.Crypto : BaseDataType.Stock;
+
+        if (_inStockMode)
+        {
+            _stockEntries = await PortfolioManager.GetStockEntries(_owner);
+            _stockTransactions = TransactionManager.GetStockTransactions(_owner);
+            ButtonColor = "background-color: #8c00ff;";
+            BackgroundColor = "background: rgb(140,0,255); background: linear-gradient(152deg, rgba(140,0,255,0.6) 1%, rgba(255,255,255,1) 80%);";
+        }
+        else
+        {
+            _cryptoEntries = await PortfolioManager.GetCryptoEntries(_owner);
+            _cryptoTransactions = TransactionManager.GetCryptoTransactions(_owner);
+            ButtonColor = "background-color: #00feff;";
+            BackgroundColor = "background: rgb(0,254,255); background: linear-gradient(152deg, rgba(0,254,255,0.4) 1%, rgba(255,255,255,1) 80%);";
+        }
+
+        StateHasChanged();
     }
 
     private async Task<ApplicationUser?> GetCurrentUser()
@@ -214,25 +249,6 @@ else
         }
     }
 
-    private async Task ToggleMode()
-    {
-        _inStockMode = !_inStockMode;
-        _type = _type == BaseDataType.Stock ? BaseDataType.Crypto : BaseDataType.Stock;
-
-        if (_inStockMode)
-        {
-            _stockEntries = await PortfolioManager.GetStockEntries(_owner);
-            _stockTransactions = TransactionManager.GetStockTransactions(_owner);
-        }
-        else
-        {
-            _cryptoEntries = await PortfolioManager.GetCryptoEntries(_owner);
-            _cryptoTransactions = TransactionManager.GetCryptoTransactions(_owner);
-        }
-
-        StateHasChanged();
-    }
-
     private async Task UpdatePort()
     {
         await PortfolioManager.UpdateAllPricesInPort(_owner);
@@ -251,4 +267,3 @@ else
     }
 
 }
-
